@@ -12,132 +12,148 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="io.phobotic.pavillion.MainActivity"
-    tools:showIn="@layout/app_bar_main">
-
-    <LinearLayout
-        android:orientation="vertical"
+    tools:showIn="@layout/app_bar_main"
+    android:clipChildren="false">
+    <android.support.v7.widget.Toolbar
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:id="@+id/linearLayout">
+        android:layout_height="wrap_content"
+        android:id="@+id/header"
+        android:layout_marginBottom="16dp">
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/location_input"
+            android:imeOptions="actionSearch"
+            android:inputType="textCapCharacters|textNoSuggestions"
+            android:maxLength="8"
+            android:gravity="center"
+            android:hint="Enter Location"
+            android:layout_centerVertical="true"
+            android:layout_alignParentStart="true"
+            android:textSize="50dp"/>
+    </android.support.v7.widget.Toolbar>
 
+
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/card_height"
+        android:layout_below="@+id/header"
+        android:id="@+id/card_base"
+        style="@style/CheckBaseCardStyle">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text=""
-            android:id="@+id/location"
-            android:layout_above="@+id/linearLayout"
-            android:layout_centerHorizontal="true"
-            android:layout_gravity="center_horizontal"
-            android:textSize="30pt"
-            android:padding="16dp"/>
+            android:text="Enter a seven digit location"
+            android:id="@+id/textView"
+            android:layout_gravity="center"
+            android:textColor="@color/primary_text_default_material_light"
+            android:textSize="30sp"/>
 
-        <android.support.v7.widget.CardView
+    </android.support.v7.widget.CardView>
+
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/card_height"
+        style="@style/CheckDigitCardStyle"
+        android:layout_below="@+id/header"
+        android:id="@+id/card_digits"
+        android:visibility="invisible">
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="@style/CheckDigitCardStyle">
-            <LinearLayout
-                android:orientation="vertical"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/cd_location"
+                android:layout_gravity="center_horizontal"
+                android:textSize="70dp"
+                android:textStyle="bold"
+                android:textColor="@color/primary_text_default_material_dark"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"/>
+
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:layout_below="@+id/cd_location">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:text=""
                     android:id="@+id/cd_main"
                     android:layout_gravity="center_horizontal"
-                    android:textSize="50pt"
-                    android:textStyle="bold"/>
+                    android:textSize="110dp"
+                    android:textStyle="bold"
+                    android:textColor="@color/primary_text_default_material_dark"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="60dp"/>
 
                 <LinearLayout
                     android:orientation="horizontal"
                     android:layout_width="wrap_content"
-                    android:layout_height="100dp"
-                    android:layout_gravity="center_horizontal">
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="60dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:text=""
                         android:id="@+id/cd_left"
-                        android:textSize="25pt"
-                        android:paddingTop="40dp"
+                        android:textSize="70dp"
+                        android:paddingTop="70dp"
                         android:layout_gravity="end"
                         android:gravity="end"
                         android:paddingRight="16dp"
-                        android:textStyle="bold"/>
+                        android:textStyle="bold"
+                        android:textColor="@color/secondary_text_default_material_dark"/>
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:text=""
                         android:id="@+id/cd_middle"
-                        android:textSize="25pt"
+                        android:textSize="70dp"
                         android:layout_gravity="end"
                         android:gravity="end"
-                        android:textStyle="bold"/>
+                        android:textStyle="bold"
+                        android:textColor="@color/secondary_text_default_material_dark"/>
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:text=""
                         android:id="@+id/cd_right"
                         android:layout_gravity="end"
                         android:gravity="end"
-                        android:textSize="25pt"
-                        android:paddingTop="40dp"
+                        android:textSize="70dp"
+                        android:paddingTop="79dp"
                         android:paddingLeft="16dp"
-                        android:textStyle="bold"/>
+                        android:textStyle="bold"
+                        android:textColor="@color/secondary_text_default_material_dark"/>
                 </LinearLayout>
-            </LinearLayout>
-        </android.support.v7.widget.CardView>
-
-
-
-
-        <RelativeLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:clipChildren="false">
-            <android.support.design.widget.FloatingActionButton
-                android:layout_width="56dp"
-                android:layout_height="56dp"
-                android:id="@+id/fab"
-                android:elevation="6dp"
-                android:layout_gravity="center"
-                android:layout_marginLeft="16dp"
-                app:backgroundTint="@color/colorPrimary"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:layout_alignParentStart="false"
-                android:layout_alignParentEnd="true"
-                android:src="@drawable/ic_magnify_white_24dp"
-                android:clickable="true">
-            </android.support.design.widget.FloatingActionButton>
-
-            <EditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/location_input"
-                android:imeOptions="actionSearch"
-                android:inputType="textCapCharacters|textNoSuggestions"
-                android:maxLength="8"
-                android:hint="Enter Location"
-                android:layout_centerVertical="true"
-                android:layout_alignParentStart="true"
-                android:layout_toLeftOf="@+id/fab"
-                android:layout_toStartOf="@+id/fab"/>
+            </RelativeLayout>
 
         </RelativeLayout>
+    </android.support.v7.widget.CardView>
 
-    </LinearLayout>
+    <android.support.design.widget.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/fab"
+        android:elevation="6dp"
+        android:layout_marginLeft="16dp"
+        app:backgroundTint="@color/colorPrimary"
+        android:src="@drawable/ic_magnify_white_24dp"
+        android:clickable="true"
+        app:fabSize="normal"
+        android:layout_below="@+id/card_digits"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="-32dp">
+    </android.support.design.widget.FloatingActionButton>
 
 </RelativeLayout>

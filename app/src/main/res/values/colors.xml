@@ -5,4 +5,6 @@
     <color name="colorAccent">#00BCD4</color>
     <color name="location_unverified">#F06D71</color>
     <color name="location_verified">@android:color/primary_text_light</color>
+    <color name="card_digits_background">@color/colorPrimary</color>
+    <color name="card_base_background">#4DD0E1</color>
 </resources>

@@ -15,8 +15,8 @@ public class CheckDigitFactory {
             String left = new LeftCheckdigit(location).toString();
 //            String middle = new MiddleCheckdigit(location).toString();
 //            String right = new RightCheckdigit(location).toString();
-            String middle = "\uD83E\uDD37";
-            String right = "\uD83E\uDD37";
+            String middle = "44";
+            String right = "99";
             CheckDigits checkDigits = new CheckDigits(main, left, middle, right);
             return checkDigits;
         } catch (IllegalFormatException e) {
