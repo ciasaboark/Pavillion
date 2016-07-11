@@ -1,5 +1,10 @@
 apply plugin: 'com.android.application'
 
+repositories {
+    // ...
+    maven { url "https://jitpack.io" }
+}
+
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.2"
@@ -31,7 +36,9 @@ dependencies {
     // http://mvnrepository.com/artifact/org.apache.poi/poi
     compile group: 'org.apache.poi', name: 'poi', version: '3.9'
 
-    // http://mvnrepository.com/artifact/org.apache.commons/commons-email
-    compile group: 'org.apache.commons', name: 'commons-email', version: '1.4'
+    compile 'com.github.yesidlazaro:GmailBackground:1.1'
+
+    // http://mvnrepository.com/artifact/joda-time/joda-time
+    compile group: 'joda-time', name: 'joda-time', version: '2.3'
 
 }

@@ -1,0 +1,42 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="@string/pref_email_key_autosend"
+        android:summary="@string/pref_email_autosend_summary"
+        android:title="@string/pref_email_autosend_title"/>
+
+    <!-- NOTE: EditTextPreference accepts EditText attributes. -->
+    <!-- NOTE: EditTextPreference's summary should be set to its value by the activity code. -->
+    <EditTextPreference
+        android:capitalize="none"
+        android:defaultValue=""
+        android:inputType="text"
+        android:key="@string/pref_email_key_server"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="@string/pref_email_server_title"/>
+
+    <EditTextPreference
+        android:capitalize="none"
+        android:defaultValue=""
+        android:inputType="numberDecimal"
+        android:key="@string/pref_email_key_port"
+        android:maxLength="5"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="@string/pref_email_port_title"/>
+
+    <EditTextPreference
+        android:capitalize="none"
+        android:defaultValue="@string/pref_email_subject_default"
+        android:inputType="textCapWords"
+        android:key="@string/pref_email_key_subject"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="@string/pref_email_subject_title"/>
+
+</PreferenceScreen>

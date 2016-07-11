@@ -1,16 +1,24 @@
 package io.phobotic.pavillion.checkdigit;
 
-import java.util.HashMap;
+import java.io.Serializable;
 
 /**
  * Created by Jonathan Nelson on 5/26/16.
  */
-public class CheckDigits {
+public class CheckDigits implements Serializable {
+    private String location;
     private String mainCheckdigit;
     private String leftCheckdigit;
     private String middleCheckdigit;
     private String rightCheckdigit;
 
+
+    public CheckDigits(String location, String main, String left, String middle, String right) {
+        this.mainCheckdigit = main;
+        this.leftCheckdigit = left;
+        this.middleCheckdigit = middle;
+        this.rightCheckdigit = right;
+    }
 
     public String getMainCheckdigit() {
         return mainCheckdigit;
@@ -28,10 +36,7 @@ public class CheckDigits {
         return rightCheckdigit;
     }
 
-    public CheckDigits(String main, String left, String middle, String right) {
-        this.mainCheckdigit = main;
-        this.leftCheckdigit = left;
-        this.middleCheckdigit = middle;
-        this.rightCheckdigit = right;
+    public String getLocation() {
+        return location;
     }
 }
