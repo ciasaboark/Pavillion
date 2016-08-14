@@ -1,12 +1,12 @@
 package io.phobotic.pavillion.service;
 
+import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
-
-import com.creativityapps.gmailbackgroundlibrary.BackgroundMail;
+import android.widget.Toast;
 
 import org.apache.poi.ss.usermodel.Workbook;
 
@@ -15,6 +15,7 @@ import java.util.List;
 
 import io.phobotic.pavillion.database.SearchRecord;
 import io.phobotic.pavillion.database.SearchesDatabase;
+import io.phobotic.pavillion.email.EmailSender;
 import io.phobotic.pavillion.email.ExcelFileBuilder;
 
 /**
@@ -53,7 +54,7 @@ public class EmailSenderService extends IntentService {
 
         try {
             sendEmailWithLocations(locationLookups);
-            db.markRecordsAsSend(unsetRecords);
+            db.markRecordsAsSent(unsetRecords);
         } catch (Exception e) {
             Log.e(TAG, "caught exception while sending email of searched locations: " + e.getMessage());
             Log.d(TAG, "skipping marking " + locationLookups.size() + " records as sent");
@@ -65,28 +66,6 @@ public class EmailSenderService extends IntentService {
         Workbook workbook = new ExcelFileBuilder(locationLookups).buildFile();
 
 
-    }
-
-    public void sendTestEmail(Context context) {
-        BackgroundMail.newBuilder(context)
-                .withUsername("")
-                .withPassword("")
-                .withMailto("")
-                .withSubject("TestMail")
-                .withBody("this is the body")
-                .withOnSuccessCallback(new BackgroundMail.OnSuccessCallback() {
-                    @Override
-                    public void onSuccess() {
-                        Log.d(TAG, "email sent successfully");
-                    }
-                })
-                .withOnFailCallback(new BackgroundMail.OnFailCallback() {
-                    @Override
-                    public void onFail() {
-                        Log.e(TAG, "unable to send email");
-                    }
-                })
-                .send();
     }
 
     public void scheduleEmailTask() {
