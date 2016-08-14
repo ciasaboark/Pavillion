@@ -17,7 +17,7 @@ import io.phobotic.pavillion.prefs.Preferences;
  */
 public class SearchesDatabase {
     private static final String TAG = SearchesDatabase.class.getSimpleName();
-    private static final String[] DB_PROJECTION = new String[]{
+    public static final String[] DB_PROJECTION = new String[]{
             Columns._ID,
             Columns.TIMESTAMP,
             Columns.LOCATION,
@@ -69,27 +69,6 @@ public class SearchesDatabase {
     public Cursor getSearchesCursor() {
         return getOrderedSearchesCursor(Columns.TIMESTAMP);
     }
-
-//    private void pruneOldSearches(long cutoff) {
-//        //we can't just use db.delete() to clear old searches since they may have attached
-//        //+ photos lingering
-//        Cursor cursor = null;
-//
-//        try {
-//            cursor = getOldSearchesCursor(cutoff);
-//            while (cursor.moveToNext()) {
-//                int id = cursor.getInt(DB_PROJECTION_ID);
-//                String fileName = cursor.getString(DB_PROJECTION_PIC_FILE);
-//                deleteFileIfExists(fileName);
-//                deleteSearchWithId(id);
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            Log.e(TAG, "caught exception while deleting old search records: " + e.getMessage());
-//        }
-//
-//        Log.d(TAG, "deleted " + prunedSearches + " ids");
-//    }
 
     private Cursor getOrderedSearchesCursor(String order) {
         return db.query(SearchesDatabaseOpenHelper.TABLE_NAME, null, null, null, null,
@@ -219,7 +198,7 @@ public class SearchesDatabase {
     }
 
 
-    public void markRecordsAsSend(List<SearchRecord> records) {
+    public void markRecordsAsSent(List<SearchRecord> records) {
         for (SearchRecord record : records) {
             ContentValues contentValues = new ContentValues();
             contentValues.put(Columns.NOTIFICATION_SENT, 1);
