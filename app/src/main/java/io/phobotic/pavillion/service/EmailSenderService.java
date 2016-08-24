@@ -16,7 +16,8 @@ import java.util.List;
 import io.phobotic.pavillion.database.SearchRecord;
 import io.phobotic.pavillion.database.SearchesDatabase;
 import io.phobotic.pavillion.email.EmailSender;
-import io.phobotic.pavillion.email.ExcelFileBuilder;
+import io.phobotic.pavillion.prefs.Preferences;
+import io.phobotic.pavillion.schedule.EmailScheduler;
 
 /**
  * Created by Jonathan Nelson on 5/29/16.
@@ -24,6 +25,7 @@ import io.phobotic.pavillion.email.ExcelFileBuilder;
 public class EmailSenderService extends IntentService {
     public static final int REQUEST_CODE = 1;
     private static final String TAG = EmailSenderService.class.getSimpleName();
+    public static final String FORCE_SEND = "force_send";
 
 
     public EmailSenderService() {
@@ -36,41 +38,39 @@ public class EmailSenderService extends IntentService {
         SearchesDatabase db = SearchesDatabase.getInstance(this);
         Log.d(TAG, "pruning database of old entries");
         db.pruneDatabase();
-        Log.d(TAG, "searching for unsent records");
-        List<SearchRecord> unsetRecords = db.getUnsentSearches();
-        Log.d(TAG, "found " + unsetRecords.size() + " searches");
-        HashMap<String, Integer> locationLookups = new HashMap<>();
-        for (SearchRecord record : unsetRecords) {
-            Integer numLookups = locationLookups.get(record.getLocation());
-            if (numLookups == null) {
-                numLookups = 1;
-            } else {
-                numLookups++;
-            }
-            locationLookups.put(record.getLocation(), numLookups);
+
+        //only send the email if the setting has been enabled
+        Preferences prefs = Preferences.getInstance(this);
+        boolean autoSendEnabled = prefs.shouldEmailsBeSent();
+        boolean forceSend = intent.getBooleanExtra(FORCE_SEND, false);
+        if (!(autoSendEnabled || forceSend)) {
+            Log.d(TAG, "Skipping email send, disabled in settings");
+        } else {
+            Log.d(TAG, "searching for unsent records");
+            List<SearchRecord> unsetRecords = db.getUnsentSearches();
+            Log.d(TAG, "found " + unsetRecords.size() + " searches");
+            final Context context = this;
+            EmailSender emailSender = new EmailSender(this)
+                    .setFailedListener(new EmailSender.EmailStatusListener() {
+                        @Override
+                        public void onEmailSendResult(Object tag) {
+                            //a broadcast notification was sent
+                        }
+                    }, null)
+                    .setSuccessListener(new EmailSender.EmailStatusListener() {
+                        @Override
+                        public void onEmailSendResult(Object tag) {
+                            SearchesDatabase db = SearchesDatabase.getInstance(context);
+                            if (tag instanceof List) {
+                                db.markRecordsAsSent((List<SearchRecord>) tag);
+                            }
+
+                        }
+                    }, unsetRecords)
+                    .send();
         }
 
-        Log.d(TAG, "searches condensed into " + locationLookups.size() + " unique locations");
-
-        try {
-            sendEmailWithLocations(locationLookups);
-            db.markRecordsAsSent(unsetRecords);
-        } catch (Exception e) {
-            Log.e(TAG, "caught exception while sending email of searched locations: " + e.getMessage());
-            Log.d(TAG, "skipping marking " + locationLookups.size() + " records as sent");
-        }
-    }
-
-    private void sendEmailWithLocations(HashMap<String, Integer> locationLookups) {
-        Log.d(TAG, "building excel workbook with location entries");
-        Workbook workbook = new ExcelFileBuilder(locationLookups).buildFile();
-
-
-    }
-
-    public void scheduleEmailTask() {
-        //todo read schedule time from prefs
-        AlarmManager alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
-//        alarmManager.setWindow(AlarmManager.RTC_WAKEUP, );
+        EmailScheduler emailScheduler = new EmailScheduler(this);
+        emailScheduler.reschedule();
     }
 }

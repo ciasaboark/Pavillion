@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="card_location_text_height">80dp</dimen>
+    <dimen name="card_main_text_height">140dp</dimen>
+    <dimen name="card_rotate_text_height">60dp</dimen>
+    <dimen name="card_location_padding">16dp</dimen>
+    <dimen name="day_picker_margin">3dp</dimen>
+    <dimen name="day_picker_radius">56dp</dimen>
+    <dimen name="day_picker_text_size">30sp</dimen>
+</resources>

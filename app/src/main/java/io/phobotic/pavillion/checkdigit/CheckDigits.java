@@ -14,6 +14,7 @@ public class CheckDigits implements Serializable {
 
 
     public CheckDigits(String location, String main, String left, String middle, String right) {
+        this.location = location;
         this.mainCheckdigit = main;
         this.leftCheckdigit = left;
         this.middleCheckdigit = middle;

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="horizontal"
+              android:layout_width="match_parent"
+              android:layout_height="100dp"
+              android:gravity="center_vertical|center_horizontal"
+              android:id="@+id/root"
+              android:clipToPadding="false"
+              android:clipChildren="false"
+              android:outlineProvider="bounds">
+
+        <io.phobotic.pavillion.view.DayPickerDay
+            android:layout_width="@dimen/day_picker_radius"
+            android:layout_height="@dimen/day_picker_radius"
+            android:layout_margin="8dp"
+            android:id="@+id/sun"
+            android:elevation="6dp"></io.phobotic.pavillion.view.DayPickerDay>
+        <io.phobotic.pavillion.view.DayPickerDay
+            android:layout_width="@dimen/day_picker_radius"
+            android:layout_height="@dimen/day_picker_radius"
+            android:layout_margin="8dp"
+            android:id="@+id/mon"
+            android:elevation="6dp"></io.phobotic.pavillion.view.DayPickerDay>
+        <io.phobotic.pavillion.view.DayPickerDay
+            android:layout_width="@dimen/day_picker_radius"
+            android:layout_height="@dimen/day_picker_radius"
+            android:layout_margin="8dp"
+            android:id="@+id/tue"
+            android:elevation="6dp"></io.phobotic.pavillion.view.DayPickerDay>
+        <io.phobotic.pavillion.view.DayPickerDay
+            android:layout_width="@dimen/day_picker_radius"
+            android:layout_height="@dimen/day_picker_radius"
+            android:layout_margin="8dp"
+            android:id="@+id/wed"
+            android:elevation="6dp"></io.phobotic.pavillion.view.DayPickerDay>
+        <io.phobotic.pavillion.view.DayPickerDay
+            android:layout_width="@dimen/day_picker_radius"
+            android:layout_height="@dimen/day_picker_radius"
+            android:layout_margin="8dp"
+            android:id="@+id/thu"
+            android:elevation="6dp"></io.phobotic.pavillion.view.DayPickerDay>
+        <io.phobotic.pavillion.view.DayPickerDay
+            android:layout_width="@dimen/day_picker_radius"
+            android:layout_height="@dimen/day_picker_radius"
+            android:layout_margin="8dp"
+            android:id="@+id/fri"
+            android:elevation="6dp"></io.phobotic.pavillion.view.DayPickerDay>
+        <io.phobotic.pavillion.view.DayPickerDay
+            android:layout_width="@dimen/day_picker_radius"
+            android:layout_height="@dimen/day_picker_radius"
+            android:layout_margin="8dp"
+            android:id="@+id/sat"
+            android:elevation="6dp"></io.phobotic.pavillion.view.DayPickerDay>
+
+
+</LinearLayout>

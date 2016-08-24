@@ -10,19 +10,25 @@ import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -32,6 +38,7 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.InputFilter;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -54,40 +61,28 @@ import io.phobotic.pavillion.checkdigit.CheckDigitFactory;
 import io.phobotic.pavillion.checkdigit.CheckDigits;
 import io.phobotic.pavillion.database.SearchInstance;
 import io.phobotic.pavillion.database.SearchesDatabase;
+import io.phobotic.pavillion.email.EmailSender;
 import io.phobotic.pavillion.listener.PhotoTakenListener;
 import io.phobotic.pavillion.photo.PictureHandler;
-import io.phobotic.pavillion.service.EmailSenderService;
-import io.phobotic.pavillion.service.SchedulerService;
+import io.phobotic.pavillion.prefs.Preferences;
+import io.phobotic.pavillion.schedule.EmailScheduler;
+import io.phobotic.pavillion.view.LocationCard;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-
-    // The authority for the sync adapter's content provider
-    public static final String AUTHORITY = "com.example.android.datasync.provider";
-    // An account type, in the form of a domain name
-    public static final String ACCOUNT_TYPE = "example.com";
-    // The account name
-    public static final String ACCOUNT = "dummyaccount";
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int REQUEST_CAMERA_PERMISSION = 1;
     private static final String FRAGMENT_DIALOG = "dialog";
-    private static final String KEY_FAB_X = "fabX";
-    private static final String KEY_FAB_Y = "fabY";
-    private static final String KEY_FAB_VISIBLE = "fabVisible";
     private static final String KEY_CHECKDIGITS = "checkdigits";
+    private static final String KEY_ERROR_CARD_SHOWN = "error card shown";
     private final long FAB_TRANSITION_DURATION = 300;
     // Instance fields
     Account mAccount;
-    private boolean digitsCardShown = false;
+    private boolean locationCardVisible = false;
     private boolean errorCardShown = false;
     private FloatingActionButton fab;
-    private CardView digitsCard;
+    private LocationCard locationCard;
     private EditText input;
-    private TextView cardLocation;
-    private TextView mainCheckdigit;
-    private TextView leftCheckdigit;
-    private TextView middleCheckdigit;
-    private TextView rightCheckdigit;
     private boolean fabVisible;
     private boolean enableCamera = false;
     private CardView errorCard;
@@ -95,34 +90,10 @@ public class MainActivity extends AppCompatActivity
     private float fabY;
     private float fabX;
     private CheckDigits checkDigits;
+    private BroadcastReceiver emailListener;
+    private Snackbar snackbar;
 
-    public static Account createSyncAccount(Context context) {
-        // Create the account type and default account
-        Account newAccount = new Account(
-                ACCOUNT, ACCOUNT_TYPE);
-        // Get an instance of the Android account manager
-        AccountManager accountManager =
-                (AccountManager) context.getSystemService(
-                        ACCOUNT_SERVICE);
-        /*
-         * Add the account and account type, no password or user data
-         * If successful, return the Account object, otherwise report an error.
-         */
-        if (accountManager.addAccountExplicitly(newAccount, null, null)) {
-            /*
-             * If you don't set android:syncable="true" in
-             * in your <provider> element in the manifest,
-             * then call context.setIsSyncable(account, AUTHORITY, 1)
-             * here.
-             */
-        } else {
-            /*
-             * The account exists or some other error occurred. Log this, report it,
-             * or handle it internally.
-             */
-        }
-        return newAccount;
-    }
+    private static final String KEY_CHECKDIGIT = "key checkdigits";
 
     private void init() {
         initFab();
@@ -155,9 +126,11 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 input.setTextColor(getResources().getColor(R.color.location_unverified));
-                if (digitsCardShown) {
+                if (locationCardVisible) {
                     hideDigitsCard();
-                } else if (errorCardShown) {
+                }
+
+                if (errorCardShown) {
                     hideErrorCard();
                 }
             }
@@ -175,12 +148,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void initDigitsCard() {
-        digitsCard = (CardView) findViewById(R.id.card_digits);
-        cardLocation = (TextView) findViewById(R.id.cd_location);
-        mainCheckdigit = (TextView) findViewById(R.id.cd_main);
-        leftCheckdigit = (TextView) findViewById(R.id.cd_left);
-        middleCheckdigit = (TextView) findViewById(R.id.cd_middle);
-        rightCheckdigit = (TextView) findViewById(R.id.cd_right);
+        locationCard = (LocationCard) findViewById(R.id.location_card);
+        locationCard.clear();
     }
 
     private void initErrorCard() {
@@ -197,8 +166,6 @@ public class MainActivity extends AppCompatActivity
             }
         });
         fab.setVisibility(View.INVISIBLE);
-        fabX = fab.getX();
-        fabY = fab.getY();
         fabVisible = false;
     }
 
@@ -217,13 +184,35 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        Log.d(TAG, "starting scheduler service");
-        Intent schedulerIntent = new Intent(this, SchedulerService.class);
-        startService(schedulerIntent);
+        emailListener = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                CoordinatorLayout coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinator_main);
+                if (snackbar != null && snackbar.isShown()) {
+                    snackbar.dismiss();
+                }
+                switch (intent.getAction()) {
+                    case EmailSender.EMAIL_SEND_SUCCESS:
+                        snackbar = Snackbar.make(coordinatorLayout, "Email sent", Snackbar.LENGTH_LONG);
+                        snackbar.show();
+                        break;
+                    case EmailSender.EMAIL_SEND_FAILED:
+                        snackbar = Snackbar.make(coordinatorLayout, "Sending email failed", Snackbar.LENGTH_LONG);
+                        snackbar.show();
+                        break;
+                    case EmailSender.EMAIL_SEND_START:
+                        snackbar = Snackbar.make(coordinatorLayout, "Sending email...", Snackbar.LENGTH_LONG);
+                        snackbar.show();
+                        break;
+                }
+            }
+        };
 
         init();
 
     }
+
+
 
     @Override
     protected void onStop() {
@@ -237,22 +226,12 @@ public class MainActivity extends AppCompatActivity
         super.onDestroy();
     }
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putFloat(KEY_FAB_X, fabX);
-        outState.putFloat(KEY_FAB_Y, fabY);
-        outState.putBoolean(KEY_FAB_VISIBLE, fabVisible);
-        outState.putSerializable(KEY_CHECKDIGITS, checkDigits);
-    }
-
     private void initCamera() {
         requestCameraPermissions();
     }
 
     private void calculateCheckdigits() {
         Log.d(TAG, "performing checkdigt lookup");
-        hideSoftKeyboard();
         String location = input.getText().toString();
         checkDigits = null;
 
@@ -266,14 +245,11 @@ public class MainActivity extends AppCompatActivity
             hideErrorCard();
             showDigitsCard();
         } catch (ParseException e) {
-            mainCheckdigit.setText("");
-            leftCheckdigit.setText("");
-            middleCheckdigit.setText("");
-            rightCheckdigit.setText("");
-            if (digitsCardShown) {
+            locationCard.clear();
+            if (locationCardVisible) {
                 hideDigitsCard();
             }
-            showErrorCard(e.getMessage());
+            showErrorCard("Unable to generate checkdigits for " + location);
         }
     }
 
@@ -303,7 +279,6 @@ public class MainActivity extends AppCompatActivity
                 @Override
                 public void onAnimationEnd(Animator animation) {
                     errorCard.setVisibility(View.INVISIBLE);
-                    errorCardShown = false;
                     errorCard.setX(cx);
                     fab.setClickable(true);
                 }
@@ -320,6 +295,7 @@ public class MainActivity extends AppCompatActivity
             });
             animX.start();
         }
+        errorCardShown = false;
     }
 
     private void showErrorCard(String message) {
@@ -385,19 +361,10 @@ public class MainActivity extends AppCompatActivity
 
     private void showDigitsCard() {
         assert (checkDigits != null) : "expected checkdigits to be non-null";
-
-        cardLocation.setText(checkDigits.getLocation());
-        mainCheckdigit.setText(checkDigits.getMainCheckdigit());
-        leftCheckdigit.setText(checkDigits.getLeftCheckdigit());
-        middleCheckdigit.setText(checkDigits.getMiddleCheckdigit());
-        rightCheckdigit.setText(checkDigits.getRightCheckdigit());
+        locationCard.setLocation(checkDigits);
         input.setTextColor(getResources().getColor(R.color.location_verified));
+        input.setText("");
         transitionFab();
-    }
-
-    private void sendEmail() {
-        EmailSenderService sender = new EmailSenderService(this);
-        sender.sendTestEmail(this);
     }
 
     private void transitionFab() {
@@ -407,16 +374,17 @@ public class MainActivity extends AppCompatActivity
         }
 
         Log.d(TAG, "original fab coordinates. x:" + fabX + " y:" + fabY);
-        float offsetX = digitsCard.getWidth() / 2;
-        float offsetY = digitsCard.getHeight() / 2;
+        float offsetX = locationCard.getWidth() / 2;
+        float offsetY = locationCard.getHeight() / 2;
         float offsetFabX = fab.getWidth() / 2;
         float offsetFabY = fab.getHeight() / 2;
-        float startX = digitsCard.getX();
-        float startY = digitsCard.getY();
+        float startX = locationCard.getX();
+        float startY = locationCard.getY();
         float cx = startX + offsetX - offsetFabX;
         float cy = startY + offsetY - offsetFabY;
         Log.d(TAG, "transitioning fab coordinates to x:" + cx + " y:" + cy);
-
+        fabX = fab.getX();
+        fabY = fab.getY();
         ObjectAnimator moveX = ObjectAnimator.ofFloat(fab, "x", cx);
         ObjectAnimator moveY = ObjectAnimator.ofFloat(fab, "y", cy);
         moveX.setInterpolator(new DecelerateInterpolator());
@@ -472,29 +440,16 @@ public class MainActivity extends AppCompatActivity
         as.start();
     }
 
-    private void circularReveal() {
-        int cx = digitsCard.getWidth() / 2;
-        int cy = digitsCard.getHeight() / 2;
-        float radius = (float) Math.hypot(cx, cy);
-        if (Build.VERSION.SDK_INT >= 21) {
-            Animator anim = ViewAnimationUtils.createCircularReveal(digitsCard, cx, cy, 0, radius);
-            anim.start();
-        }
-
-        digitsCard.setVisibility(View.VISIBLE);
-        digitsCardShown = true;
-    }
-
     private void hideDigitsCard() {
         //declare the card hidden early to prevent multiple keypresses
         // from triggering duplicate animations
-        digitsCardShown = false;
+        locationCardVisible = false;
         fab.setClickable(false);
 
         if (Build.VERSION.SDK_INT >= 21) {
-            final float cardY = digitsCard.getY();
-            float endY = cardY + 1000;  //todo get screen size
-            ObjectAnimator anim = ObjectAnimator.ofFloat(digitsCard, "y", endY);
+            final float cardY = locationCard.getY();
+            float endY = cardY + 1000;
+            ObjectAnimator anim = ObjectAnimator.ofFloat(locationCard, "y", endY);
             anim.setDuration(300);
             anim.addListener(new Animator.AnimatorListener() {
                 @Override
@@ -504,8 +459,8 @@ public class MainActivity extends AppCompatActivity
 
                 @Override
                 public void onAnimationEnd(Animator animation) {
-                    digitsCard.setVisibility(View.INVISIBLE);
-                    digitsCard.setY(cardY);
+                    locationCard.setVisibility(View.INVISIBLE);
+                    locationCard.setY(cardY);
                     showFab();
                     fab.setClickable(true);
                 }
@@ -522,10 +477,23 @@ public class MainActivity extends AppCompatActivity
             });
             anim.start();
         } else {
-            digitsCard.setVisibility(View.INVISIBLE);
-            digitsCardShown = false;
+            locationCard.setVisibility(View.INVISIBLE);
+            locationCardVisible = false;
             showFab();
         }
+    }
+
+    private void circularReveal() {
+        int cx = locationCard.getWidth() / 2;
+        int cy = locationCard.getHeight() / 2;
+        float radius = (float) Math.hypot(cx, cy);
+        if (Build.VERSION.SDK_INT >= 21) {
+            Animator anim = ViewAnimationUtils.createCircularReveal(locationCard, cx, cy, 0, radius);
+            anim.start();
+        }
+
+        locationCard.setVisibility(View.VISIBLE);
+        locationCardVisible = true;
     }
 
     @Override
@@ -539,16 +507,66 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable(KEY_CHECKDIGITS, checkDigits);
+        outState.putBoolean(KEY_ERROR_CARD_SHOWN, errorCardShown);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        checkDigits = (CheckDigits) savedInstanceState.getSerializable(KEY_CHECKDIGITS);
+        boolean showErrorCard = savedInstanceState.getBoolean(KEY_ERROR_CARD_SHOWN, false);
+        if (showErrorCard) {
+            showErrorCard("foobar");
+        } else if (checkDigits != null) {
+            showDigitsCard();
+        }
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
-
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(emailListener);
     }
 
     public void onResume() {
         super.onResume();
+        EmailScheduler scheduler = new EmailScheduler(this);
+        scheduler.reschedule();
+
         final EditText input = (EditText) findViewById(R.id.location_input);
         input.requestFocus();
         showFab();
+        IntentFilter intentFilter = new IntentFilter(EmailSender.EMAIL_SEND_SUCCESS);
+        intentFilter.addAction(EmailSender.EMAIL_SEND_FAILED);
+        intentFilter.addAction(EmailSender.EMAIL_SEND_START);
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(emailListener, intentFilter);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_CAMERA_PERMISSION) {
+            if (grantResults.length != 1 || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                ErrorDialog.newInstance(getString(R.string.request_permission))
+                        .show(getSupportFragmentManager(), FRAGMENT_DIALOG);
+            } else {
+                enableCameraSupport();
+            }
+        }
+    }
+
+    private void enableCameraSupport() {
+        this.enableCamera = true;
     }
 
     private void showFab() {
@@ -562,25 +580,9 @@ public class MainActivity extends AppCompatActivity
             fab.setVisibility(View.VISIBLE);
             scaleXY.start();
             fabVisible = true;
+            fabX = fab.getX();
+            fabY = fab.getY();
         }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-        if (requestCode == REQUEST_CAMERA_PERMISSION) {
-            if (grantResults.length != 1 || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                ErrorDialog.newInstance(getString(R.string.request_permission))
-                        .show(getSupportFragmentManager(), FRAGMENT_DIALOG);
-            }
-        } else {
-            enableCameraSupport();
-            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        }
-    }
-
-    private void enableCameraSupport() {
-        this.enableCamera = true;
     }
 
     @Override
@@ -607,10 +609,44 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_checkdigit) {
-            // Switch to main fragment
-        } else if (id == R.id.nav_settings) {
-            startActivity(new Intent(this, SettingsActivity.class));
+        if (id == R.id.nav_settings) {
+            final Context context  = this;
+            final EditText input = new EditText(MainActivity.this);
+            input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            input.setImeActionLabel(getString(android.R.string.ok), KeyEvent.KEYCODE_ENTER);
+            final AlertDialog passwordDialog = new AlertDialog.Builder(this)
+                    .setTitle("Settings")
+                    .setMessage("Enter password")
+                    .setView(input)
+                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(final DialogInterface dialog, int which) {
+                            String pass = input.getText().toString();
+                            Preferences preferences = Preferences.getInstance(context);
+                            String curPass = preferences.getSettingsPassword();
+
+                            if (pass.equals(curPass)) {
+                                startActivity(new Intent(context, SettingsActivity.class));
+                            } else {
+                                final AlertDialog errorDialog = new AlertDialog.Builder(context)
+                                        .setTitle("Error")
+                                        .setMessage("Incorrect password")
+                                        .setNegativeButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                dialog.dismiss();
+                                            }
+                                        }).show();
+                            }
+
+                        }
+                    })
+                    .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    }).show();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

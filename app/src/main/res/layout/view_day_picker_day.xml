@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout
+        android:id="@+id/background"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="@dimen/day_picker_radius"
+        android:layout_height="@dimen/day_picker_radius"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:background="@drawable/day_picker_background_unselected"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:stateListAnimator="@anim/lift_on_touch">
+
+    <TextView
+        android:id="@+id/text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:text="M"
+        android:textColor="?android:attr/textColorPrimaryInverse"
+        android:textSize="@dimen/day_picker_text_size"/>
+</RelativeLayout>

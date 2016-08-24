@@ -6,6 +6,11 @@
         android:summary="@string/pref_email_autosend_summary"
         android:title="@string/pref_email_autosend_title"/>
 
+    <Preference
+        android:key="@string/pref_email_key_time"
+        android:title="@string/pref_email_time_title"
+        android:summary="@string/pref_email_time_summary"/>
+
     <!-- NOTE: EditTextPreference accepts EditText attributes. -->
     <!-- NOTE: EditTextPreference's summary should be set to its value by the activity code. -->
     <EditTextPreference
@@ -31,12 +36,42 @@
 
     <EditTextPreference
         android:capitalize="none"
-        android:defaultValue="@string/pref_email_subject_default"
-        android:inputType="textCapWords"
-        android:key="@string/pref_email_key_subject"
+        android:defaultValue=""
+        android:inputType="text"
+        android:key="@string/pref_email_key_username"
         android:maxLines="1"
         android:selectAllOnFocus="true"
         android:singleLine="true"
-        android:title="@string/pref_email_subject_title"/>
+        android:title="@string/pref_email_username_title"/>
+
+    <EditTextPreference
+        android:capitalize="none"
+        android:defaultValue=""
+        android:inputType="textPassword"
+        android:key="@string/pref_email_key_password"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="@string/pref_email_password_title"/>
+
+    <EditTextPreference
+        android:capitalize="none"
+        android:defaultValue=""
+        android:inputType="textEmailAddress"
+        android:key="@string/pref_email_key_recipients"
+        android:selectAllOnFocus="true"
+        android:title="@string/pref_email_recipients_title"
+        android:summary="@string/pref_email_recipients_summary"/>
+
+
+    <Preference android:title="@string/pref_email_test_title"
+                android:key="@string/pref_email_key_test"
+                android:summary="@string/pref_email_test_summary"/>
+
+    <Preference android:title="@string/pref_email_send_now_title"
+                android:key="@string/pref_email_key_send_now"
+                android:summary="@string/pref_email_send_now_summary" />
+
+
 
 </PreferenceScreen>

@@ -80,8 +80,14 @@ public class SearchesDatabase {
         int prunedPics = 0;
 
         Preferences prefs = Preferences.getInstance(context);
-        long maxSearchAge = prefs.getMaxSearchAge();
-        long maxPicAge = prefs.getMaxPhotosAge();
+        long MS_SECOND = 1000;
+        long MS_MIN = MS_SECOND * 60;
+        long MS_HOUR = MS_MIN * 60;
+        long MS_DAY = MS_HOUR * 24;
+        long MS_MONTH = MS_DAY * 31;
+        long maxSearch = 1000 * 60 * 60 * 24 * 31;
+        long maxSearchAge = MS_MONTH;
+        long maxPicAge = MS_MONTH;
         //query based off the shortest age
         long offset = maxSearchAge > maxPicAge ? maxPicAge : maxSearchAge;
         long timestamp = System.currentTimeMillis() - offset;

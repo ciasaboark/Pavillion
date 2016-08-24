@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Pavillion</string>
+    <string name="app_name">Check Digit</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -24,14 +24,56 @@
     <string name="pref_email_autosend_title">Send email updates</string>
     <string name="pref_email_autosend_summary">Automatically send updates for searched locations</string>
 
+    <string name="pref_email_time_title">Email schedule</string>
+    <string name="pref_email_time_summary">Set time and day emails will be sent</string>
+
     <string name="pref_email_server_title">Server address</string>
     <string name="pref_email_port_title">Server port number</string>
+    <string name="pref_email_username_title">Email username</string>
+    <string name="pref_email_password_title">Email password</string>
+    <string name="pref_email_password_summary">No password set</string>
+
+    <string name="pref_email_recipients_title">Email recipients</string>
+    <string name="pref_email_recipients_summary">Separate multiple addresses with ‘,’</string>
+
     <string name="pref_email_subject_title">Email Subject Line</string>
     <string name="pref_email_subject_default">Recent Location Lookups</string>
 
+    <string name="pref_email_test_title">Test email settings</string>
+    <string name="pref_email_test_summary">Send test email</string>
+
+    <string name="pref_email_send_now_title">Send records</string>
+    <string name="pref_email_send_now_summary">Send all unsent records</string>
+
 
     <string name="pref_email_key_autosend">email.autosend</string>
+    <string name="pref_email_key_time">email.time</string>
+    <string name="pref_email_key_days">email.days</string>
     <string name="pref_email_key_server">email.server</string>
     <string name="pref_email_key_port">email.port</string>
     <string name="pref_email_key_subject">email.subject</string>
+    <string name="pref_email_key_recipients">email.recipients</string>
+    <string name="pref_email_key_password">email.password</string>
+    <string name="pref_email_key_username">email.username</string>
+    <string name="pref_email_key_test">email.test</string>
+    <string name="pref_email_key_send_now">email.send_now</string>
+
+    <!-- Password Settings -->
+    <string name="pref_header_password">Settings Password</string>
+
+    <string name="pref_password_title_password">Settings password</string>
+    <string name="pref_password_key_password">settings.password</string>
+
+    <string name="pref_password_title_reset">Reset password to default</string>
+    <string name="pref_password_summary_reset">Password will default to ‘1234’</string>
+    <string name="pref_password_key_reset">settings.password.reset</string>
+
+    <string name="pref_password_title_change">Change password</string>
+    <string name="pref_password_key_change">settings.password.change</string>
+
+    <!-- Generic Button Strings -->
+    <string name="button_save">Save</string>
+    <string name="button_send">Send</string>
+
+
 </resources>

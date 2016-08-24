@@ -2,14 +2,18 @@ package io.phobotic.pavillion.prefs;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.media.MediaDrm;
+import android.preference.PreferenceManager;
 
 import org.jetbrains.annotations.NotNull;
+
+import io.phobotic.pavillion.R;
 
 /**
  * Created by Jonathan Nelson on 5/29/16.
  */
 public class Preferences {
-    private static final String PREFS_FILE = "prefs";
+//    private static final String PREFS_FILE = "prefs";
     private static final String TAG = Preferences.class.getSimpleName();
     private static Preferences instance;
     private final Context context;
@@ -25,7 +29,34 @@ public class Preferences {
 
     private Preferences(Context ctx) {
         this.context = ctx;
-        sharedPreferences = context.getSharedPreferences(PREFS_FILE, context.MODE_PRIVATE);
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+    }
+
+    public String getEmailServer() {
+        return sharedPreferences.getString(context.getString(R.string.pref_email_key_server), null);
+    }
+
+    public int getEmailPort() {
+        String portString = sharedPreferences.getString(
+                context.getString(R.string.pref_email_key_port), "-1");
+        return Integer.valueOf(portString);
+    }
+
+    public String getEmailUsername() {
+        return sharedPreferences.getString(context.getString(R.string.pref_email_key_username), null);
+    }
+
+    public String getEmailPassword() {
+        return sharedPreferences.getString(context.getString(R.string.pref_email_key_password), null);
+    }
+
+    public String getEmailRecipients() {
+        return sharedPreferences.getString(context.getString(R.string.pref_email_key_recipients), null);
+    }
+
+    public String getEmailSubject() {
+        return sharedPreferences.getString(context.getString(R.string.pref_email_key_subject),
+                context.getString(R.string.pref_email_subject_default));
     }
 
     /**
@@ -77,7 +108,8 @@ public class Preferences {
      * @return
      */
     public long getMaxPhotosAge() {
-        return sharedPreferences.getLong(Keys.MAX_PHOTO_AGE, DefaultPrefs.DB_MAX_PIC_AGE);
+        long age =  sharedPreferences.getLong(Keys.MAX_PHOTO_AGE, DefaultPrefs.DB_MAX_PIC_AGE);
+        return age;
     }
 
     /**
@@ -99,7 +131,8 @@ public class Preferences {
      * @return
      */
     public long getMaxSearchAge() {
-        return sharedPreferences.getLong(Keys.MAX_SEARCH_AGE, DefaultPrefs.DB_MAX_SEARCH_AGE);
+        long age =  sharedPreferences.getLong(Keys.MAX_SEARCH_AGE, DefaultPrefs.DB_MAX_SEARCH_AGE);
+        return age;
     }
 
     /**
@@ -110,7 +143,64 @@ public class Preferences {
      * @param maxAge
      */
     public void setMaxSearchAge(long maxAge) {
-        sharedPreferences.edit().putLong(Keys.MAX_SEARCH_AGE, maxAge);
+        sharedPreferences.edit().putLong(Keys.MAX_SEARCH_AGE, maxAge).apply();
+    }
+
+    /**
+     * Get the current password to access the settings activity, or the default password if none
+     * has been set.
+     */
+    public String getSettingsPassword() {
+        return sharedPreferences.getString(context.getString(R.string.pref_password_key_password), DefaultPrefs.SETTINGS_PASSWORD);
+    }
+
+    public boolean isSettingsPasswordSet() {
+        String curPass = sharedPreferences.getString(context.getString(R.string.pref_password_key_password), null);
+        return curPass != null;
+    }
+
+    /**
+     * Set a new password for access to the settings activity.
+     * @param password The new password for the Settings activity.  This password is stored as
+     *                 plaintext
+     */
+    public void setSettingsPassword(String password) {
+        if (password == null || password.equals("")) {
+            sharedPreferences.edit().remove(context.getString(R.string.pref_password_key_password)).apply();
+        } else {
+            sharedPreferences.edit().putString(context.getString(R.string.pref_password_key_password), password).apply();
+        }
+    }
+
+    public boolean shouldEmailsBeSent() {
+        boolean shouldEmailsBeSent = sharedPreferences.getBoolean(context.getString(R.string.pref_email_key_autosend), false);
+        return shouldEmailsBeSent;
+    }
+
+    public void setEmailTime(String syncTime) {
+        sharedPreferences.edit().putString(context.getString(R.string.pref_email_key_time),
+                syncTime).apply();
+    }
+
+    public String getEmailTime() {
+        String time = sharedPreferences.getString(context.getString(R.string.pref_email_key_time),
+                null);
+        if (time == null) {
+            time = DefaultPrefs.EMAIL_TIME_HOUR + ":" + DefaultPrefs.EMAIL_TIME_MINUTE;
+        }
+
+        return time;
+    }
+
+    public void setEmailDays(String days) {
+        sharedPreferences.edit().putString(context.getString(R.string.pref_email_key_days),
+                days).apply();
+    }
+
+    public String getEmailDays() {
+        String days = sharedPreferences.getString(context.getString(R.string.pref_email_key_days),
+                DefaultPrefs.EMAIL_DAYS);
+        return days;
     }
 
     private static class Keys {
@@ -119,9 +209,6 @@ public class Preferences {
         public static final String EMAIL_TIME_HOUR = "email_time_hour";
         public static final String EMAIL_TIME_MIN = "email_time_min";
         public static final String EMAIL_RECEPIENT_LIST = "email_recepient_list";
-        public static final String EMAIL_SERVER_ADDRESS = "email_server_address";
-        public static final String EMAIL_SERVER_PORT = "email_server_port";
-        public static final String EMAIL_SUBJECT = "email_subject";
     }
 
 

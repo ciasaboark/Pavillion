@@ -55,7 +55,6 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/error_card_title"
                 android:layout_centerHorizontal="true"
-                android:text="GA25547"
                 android:textAppearance="?android:attr/textAppearanceLargeInverse"
                 android:textSize="40dp"/>
         </RelativeLayout>
@@ -63,98 +62,15 @@
     </android.support.v7.widget.CardView>
 
 
-    <android.support.v7.widget.CardView
-        android:id="@+id/card_digits"
-        style="@style/CheckDigitCardStyle"
+    <io.phobotic.pavillion.view.LocationCard
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/location_input"
-        android:layout_margin="16dp"
-        android:clickable="true"
+        android:id="@+id/location_card"
+        android:visibility="invisible"
+        android:layout_below="@id/location_input"
         android:stateListAnimator="@anim/lift_on_touch"
-        android:visibility="invisible">
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <TextView
-                android:id="@+id/cd_location"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_centerHorizontal="true"
-                android:layout_gravity="center_horizontal"
-                android:textColor="@color/primary_text_default_material_dark"
-                android:textSize="@dimen/card_location_text_height"
-                android:textStyle="bold"/>
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/cd_location">
-
-                <TextView
-                    android:id="@+id/cd_main"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_centerVertical="true"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginLeft="@dimen/card_location_padding"
-                    android:textColor="@color/primary_text_default_material_dark"
-                    android:textSize="@dimen/card_main_text_height"
-                    android:textStyle="bold"/>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginRight="@dimen/card_location_padding"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:id="@+id/cd_left"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="end"
-                        android:gravity="end"
-                        android:paddingRight="16dp"
-                        android:paddingTop="@dimen/card_rotate_text_height"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:textColor="@color/secondary_text_default_material_dark"
-                        android:textSize="@dimen/card_rotate_text_height"
-                        android:textStyle="bold"/>
-
-                    <TextView
-                        android:id="@+id/cd_middle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="end"
-                        android:gravity="end"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:textColor="@color/secondary_text_default_material_dark"
-                        android:textSize="@dimen/card_rotate_text_height"
-                        android:textStyle="bold"/>
-
-                    <TextView
-                        android:id="@+id/cd_right"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="end"
-                        android:gravity="end"
-                        android:paddingLeft="16dp"
-                        android:paddingTop="@dimen/card_rotate_text_height"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:textColor="@color/secondary_text_default_material_dark"
-                        android:textSize="@dimen/card_rotate_text_height"
-                        android:textStyle="bold"/>
-                </LinearLayout>
-            </RelativeLayout>
-
-        </RelativeLayout>
-    </android.support.v7.widget.CardView>
+        style="@style/CheckDigitCardStyle"
+        android:layout_margin="6dp"></io.phobotic.pavillion.view.LocationCard>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"

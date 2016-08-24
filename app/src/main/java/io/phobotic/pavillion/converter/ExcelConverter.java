@@ -50,7 +50,8 @@ public class ExcelConverter {
             "CD Left",
             "CD Mid",
             "CD Right",
-            "Lookups"
+            "Lookups",
+            "Needs Label?"
     };
     private Map<String, Integer> locationLookups;
 
@@ -63,6 +64,9 @@ public class ExcelConverter {
     private void init() {
         wb = new HSSFWorkbook();
         sheet = wb.createSheet("Location Lookups");
+        sheet.setColumnWidth(0, 100);
+        sheet.setColumnWidth(1, 50);
+        sheet.setColumnWidth(2, 25);
         initStyles();
     }
 
@@ -73,8 +77,7 @@ public class ExcelConverter {
         headerFont.setBoldweight(Font.BOLDWEIGHT_BOLD);
 
         headerStyle = wb.createCellStyle();
-        headerStyle.setFillForegroundColor(HSSFColor.GREY_25_PERCENT.index);
-        headerStyle.setFillForegroundColor(IndexedColors.CORAL.index);
+        headerStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.index);
         headerStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);
         headerStyle.setAlignment(CellStyle.ALIGN_CENTER);
         headerStyle.setFont(headerFont);
@@ -103,7 +106,7 @@ public class ExcelConverter {
         recordHiddenStyle.setBorderTop(borderStyle);
         recordHiddenStyle.setBorderRight(borderStyle);
         recordHiddenStyle.setBorderLeft(borderStyle);
-        recordHiddenStyle.setFillForegroundColor(HSSFColor.LIGHT_BLUE.index);
+        recordHiddenStyle.setFillForegroundColor(IndexedColors.LIGHT_CORNFLOWER_BLUE.index);
         recordHiddenStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);
     }
 

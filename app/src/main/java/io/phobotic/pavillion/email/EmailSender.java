@@ -1,8 +1,11 @@
 package io.phobotic.pavillion.email;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import java.io.File;
@@ -34,6 +37,10 @@ import io.phobotic.pavillion.prefs.Preferences;
  */
 
 public class EmailSender {
+    public static final String EMAIL_SEND_SUCCESS = "email_sent";
+    public static final String EMAIL_SEND_FAILED = "email_failed";
+    public static final String EMAIL_SEND_START = "email_start";
+
     private static final String TAG = EmailSender.class.getSimpleName();
     private Context context;
     private EmailStatusListener failedListener;
@@ -67,13 +74,24 @@ public class EmailSender {
         void onEmailSendResult(Object tag);
     }
 
+    private void notifyStart() {
+        Intent i = new Intent(EMAIL_SEND_START);
+        LocalBroadcastManager.getInstance(context).sendBroadcast(i);
+    }
+
     private void notifySuccess() {
+        //send broadcast notification
+        Intent i = new Intent(EMAIL_SEND_SUCCESS);
+        LocalBroadcastManager.getInstance(context).sendBroadcast(i);
         if (successListener != null) {
             successListener.onEmailSendResult(successTag);
         }
     }
 
     private void notifyFail() {
+        //send broadcast notification
+        Intent i = new Intent(EMAIL_SEND_FAILED);
+        LocalBroadcastManager.getInstance(context).sendBroadcast(i);
         if (failedListener != null) {
             failedListener.onEmailSendResult(failedTag);
         }
@@ -81,64 +99,73 @@ public class EmailSender {
 
     public EmailSender send() {
         Preferences prefs = Preferences.getInstance(context);
-        String server = prefs.getEmailServer();
-        int port = prefs.getEmailPort();
-        String username = prefs.getEmailUsername();
-        String password = prefs.getEmailPassword();
-        String recipients = prefs.getEmailRecipients();
-        DateFormat df = SimpleDateFormat.getDateInstance();
-        String dateString = df.format(new Date());
-        String subject = "Check Digit Lookups for " + dateString;
-        String body = "Location check digit lookups for " + dateString;
-
-        Email email = new Email()
-                .setServer(server)
-                .setPort(port)
-                .setUsername(username)
-                .setPassword(password)
-                .setRecipients(recipients)
-                .setSubject(subject)
-                .setBody(body);
-
-        SearchesDatabase db = SearchesDatabase.getInstance(context);
-        List<SearchRecord> records = db.getUnsentSearches();
-        Attachment attachment = null;
         try {
+            String server = prefs.getEmailServer();
+            int port = prefs.getEmailPort();
+            String username = prefs.getEmailUsername();
+            String password = prefs.getEmailPassword();
+            String recipients = prefs.getEmailRecipients();
+            DateFormat df = SimpleDateFormat.getDateInstance();
+            String dateString = df.format(new Date());
+            String subject = "Check Digit Lookups for " + dateString;
+            String body = "Location check digit lookups for " + dateString;
+
+            Email email = new Email()
+                    .setServer(server)
+                    .setPort(port)
+                    .setUsername(username)
+                    .setPassword(password)
+                    .setRecipients(recipients)
+                    .setSubject(subject)
+                    .setBody(body);
+
+            SearchesDatabase db = SearchesDatabase.getInstance(context);
+            List<SearchRecord> records = db.getUnsentSearches();
+            Attachment attachment = null;
+
             ExcelConverter converter = new ExcelConverter(context, records);
             File file = converter.convert();
             attachment = new Attachment(file, file.getName());
             email.addAttachment(attachment);
-        } catch (IOException e) {
-            Log.e(TAG, "Unable to convert records into " +
-                    "excel file.\n\nError: " + e.getMessage());
-            //todo modify email to send details of error
+
+            EmailSendTask emailSendTask = new EmailSendTask();
+            emailSendTask.execute(email);
+        } catch (Exception e) {
+            Log.e(TAG, "Caught exception while trying to send email: " + e.getMessage());
+            e.printStackTrace();
+            notifyFail();
         }
 
-        EmailSendTask emailSendTask = new EmailSendTask();
-        emailSendTask.execute(email);
+
 
         return this;
     }
 
     public EmailSender sendTestEmail() {
         Preferences prefs = Preferences.getInstance(context);
-        String server = prefs.getEmailServer();
-        int port = prefs.getEmailPort();
-        String username = prefs.getEmailUsername();
-        String password = prefs.getEmailPassword();
-        String recipients = prefs.getEmailRecipients();
+        try {
+            String server = prefs.getEmailServer();
+            int port = prefs.getEmailPort();
+            String username = prefs.getEmailUsername();
+            String password = prefs.getEmailPassword();
+            String recipients = prefs.getEmailRecipients();
 
-        Email email = new Email()
-                .setServer(server)
-                .setPort(port)
-                .setUsername(username)
-                .setPassword(password)
-                .setRecipients(recipients)
-                .setSubject("Test message")
-                .setBody("This is a test message from the Check Digits android app.  You can " +
-                        "safely ignore this message");
-        EmailSendTask emailSendTask = new EmailSendTask();
-        emailSendTask.execute(email);
+            Email email = new Email()
+                    .setServer(server)
+                    .setPort(port)
+                    .setUsername(username)
+                    .setPassword(password)
+                    .setRecipients(recipients)
+                    .setSubject("Test message")
+                    .setBody("This is a test message from the Check Digits android app.  You can " +
+                            "safely ignore this message");
+            EmailSendTask emailSendTask = new EmailSendTask();
+            emailSendTask.execute(email);
+        } catch (Exception e) {
+            Log.d(TAG, "Caught excption while sending test email: " + e.getMessage());
+            e.printStackTrace();
+            notifyFail();
+        }
 
         return this;
     }
@@ -146,6 +173,7 @@ public class EmailSender {
     private class EmailSendTask extends AsyncTask<Email, Void, Boolean>{
         @Override
         protected Boolean doInBackground(Email[] emails) {
+            notifyStart();
             for (Email email: emails) {
                 if (!email.isValid()) {
                     Log.d(TAG, "Unable to send email. One or more of server, port, username, or password " +
@@ -164,8 +192,6 @@ public class EmailSender {
                     props.setProperty("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
                     props.setProperty("mail.smtp.socketFactory.fallback", "false");
                     props.setProperty("mail.smtp.socketFactory.port", "465");
-
-                    //// TODO: 8/13/16
 
                     Session mailSession = Session.getDefaultInstance(props, null);
 
