@@ -3,9 +3,7 @@ package io.phobotic.pavillion.converter;
 import android.content.Context;
 
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
-import org.apache.poi.hssf.usermodel.HSSFFont;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Font;
@@ -64,9 +62,6 @@ public class ExcelConverter {
     private void init() {
         wb = new HSSFWorkbook();
         sheet = wb.createSheet("Location Lookups");
-        sheet.setColumnWidth(0, 100);
-        sheet.setColumnWidth(1, 50);
-        sheet.setColumnWidth(2, 25);
         initStyles();
     }
 
@@ -114,10 +109,9 @@ public class ExcelConverter {
         File file = null;
 
         sortRecords();
-        countRecords();
+        countUniqueRecords();
         writeHeaders();
         writeRows();
-//        resizeColumns();
 
         File dir = context.getFilesDir();
         file = new File(dir, "/excel/" + FILE_NAME);
@@ -134,12 +128,6 @@ public class ExcelConverter {
         return file;
     }
 
-    private void resizeColumns() {
-        for (int col = 0; col < FIELDS.length; col++) {
-            sheet.autoSizeColumn(col);
-        }
-    }
-
     private void sortRecords() {
         Collections.sort(records, new Comparator<SearchRecord>() {
             @Override
@@ -149,7 +137,7 @@ public class ExcelConverter {
         });
     }
 
-    private void countRecords() {
+    private void countUniqueRecords() {
         locationLookups = new HashMap<>();
         for (SearchRecord record: records) {
             String location = record.getLocation();

@@ -40,4 +40,16 @@ public class CheckDigits implements Serializable {
     public String getLocation() {
         return location;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof CheckDigits)) {
+            return false;
+        } else {
+            return this.getLocation().equals(((CheckDigits) obj).getLocation()) &&
+                    this.getMainCheckdigit().equals(((CheckDigits) obj).getMainCheckdigit()) &&
+                    this.getLeftCheckdigit().equals(((CheckDigits) obj).getLeftCheckdigit()) &&
+                    this.getRightCheckdigit().equals(((CheckDigits) obj).getRightCheckdigit());
+        }
+    }
 }

@@ -33,7 +33,7 @@
         android:layout_below="@id/location_input"
         android:layout_margin="16dp"
         android:clickable="true"
-        android:stateListAnimator="@anim/lift_on_touch"
+        android:stateListAnimator="@animator/lift_on_touch"
         android:visibility="invisible">
 
         <RelativeLayout
@@ -58,7 +58,6 @@
                 android:textAppearance="?android:attr/textAppearanceLargeInverse"
                 android:textSize="40dp"/>
         </RelativeLayout>
-
     </android.support.v7.widget.CardView>
 
 
@@ -68,7 +67,7 @@
         android:id="@+id/location_card"
         android:visibility="invisible"
         android:layout_below="@id/location_input"
-        android:stateListAnimator="@anim/lift_on_touch"
+        android:stateListAnimator="@animator/lift_on_touch"
         style="@style/CheckDigitCardStyle"
         android:layout_margin="6dp"></io.phobotic.pavillion.view.LocationCard>
 

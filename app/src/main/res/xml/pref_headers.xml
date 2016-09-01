@@ -3,14 +3,19 @@
     <!-- These settings headers are only used on tablets. -->
 
     <header
-        android:fragment="io.phobotic.pavillion.SettingsActivity$EmailPreferenceFragment"
+        android:fragment="io.phobotic.pavillion.fragment.EmailPreferenceFragment"
         android:icon="@drawable/ic_email_black_24dp"
         android:title="@string/pref_header_email"/>
 
     <header
-        android:fragment="io.phobotic.pavillion.SettingsActivity$PasswordPreferenceFragment"
+        android:fragment="io.phobotic.pavillion.fragment.PasswordPreferenceFragment"
         android:icon="@drawable/ic_settings_black_24dp"
         android:title="@string/pref_header_password"/>
+
+    <header
+        android:fragment="io.phobotic.pavillion.fragment.RecordsPreferenceFragment"
+        android:icon="@drawable/ic_magnify_black_24dp"
+        android:title="View Records" />
 
 
 

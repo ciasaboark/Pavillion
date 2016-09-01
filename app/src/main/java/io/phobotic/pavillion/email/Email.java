@@ -100,12 +100,12 @@ class Email {
 
     public boolean isValid() {
         Matcher pattern = Patterns.EMAIL_ADDRESS.matcher(recipients);
+
         if (server == null ||
                 port == -1 ||
                 username == null ||
                 password == null ||
-                recipients == null ||
-                !pattern.matches()) {
+                recipients == null) {
             return false;
         } else {
             return true;

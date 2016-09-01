@@ -10,4 +10,7 @@
     <dimen name="day_picker_radius">32dp</dimen>
     <dimen name="day_picker_text_size">15sp</dimen>
     <dimen name="day_picker_margin">3dp</dimen>
+
+    <dimen name="list_location">25sp</dimen>
+    <dimen name="list_timestamp">20sp</dimen>
 </resources>

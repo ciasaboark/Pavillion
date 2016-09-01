@@ -72,7 +72,7 @@ public class SearchesDatabase {
 
     private Cursor getOrderedSearchesCursor(String order) {
         return db.query(SearchesDatabaseOpenHelper.TABLE_NAME, null, null, null, null,
-                null, order, null);
+                null, order + " DESC", null);
     }
 
     public void pruneDatabase() {

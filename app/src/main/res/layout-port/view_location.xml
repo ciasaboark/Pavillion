@@ -50,9 +50,8 @@
                     android:textStyle="bold"
                     android:text="M"
                     android:layout_weight="1"
-                    android:layout_marginRight="150dp"
                     android:layout_centerHorizontal="false"
-                    android:layout_marginTop="-20dp"/>
+                    />
 
                 <TextView
                     android:id="@+id/cd_left"
