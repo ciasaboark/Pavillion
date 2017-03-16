@@ -1,16 +1,5 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <SwitchPreference
-        android:defaultValue="true"
-        android:key="@string/pref_email_key_autosend"
-        android:summary="@string/pref_email_autosend_summary"
-        android:title="@string/pref_email_autosend_title"/>
-
-    <Preference
-        android:key="@string/pref_email_key_time"
-        android:title="@string/pref_email_time_title"
-        android:summary="@string/pref_email_time_summary"/>
-
     <!-- NOTE: EditTextPreference accepts EditText attributes. -->
     <!-- NOTE: EditTextPreference's summary should be set to its value by the activity code. -->
     <EditTextPreference
@@ -54,24 +43,17 @@
         android:singleLine="true"
         android:title="@string/pref_email_password_title"/>
 
-    <EditTextPreference
-        android:capitalize="none"
-        android:defaultValue=""
-        android:inputType="textEmailAddress"
-        android:key="@string/pref_email_key_recipients"
-        android:selectAllOnFocus="true"
-        android:title="@string/pref_email_recipients_title"
-        android:summary="@string/pref_email_recipients_summary"/>
+    <Preference
+        android:icon="@drawable/ic_account_multiple_black_24dp"
+        android:key="@string/pref_email_key_recipients_set"
+        android:title="@string/pref_email_recipients_title"/>
 
 
-    <Preference android:title="@string/pref_email_test_title"
-                android:key="@string/pref_email_key_test"
-                android:summary="@string/pref_email_test_summary"/>
-
-    <Preference android:title="@string/pref_email_send_now_title"
-                android:key="@string/pref_email_key_send_now"
-                android:summary="@string/pref_email_send_now_summary" />
-
+    <Preference
+        android:icon="@drawable/ic_send_black_24dp"
+        android:key="@string/pref_email_key_test"
+        android:summary="@string/pref_email_test_summary"
+        android:title="@string/pref_email_test_title"/>
 
 
 </PreferenceScreen>

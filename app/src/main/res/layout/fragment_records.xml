@@ -4,19 +4,21 @@
                 xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:clipChildren="false"
-    >
+                android:clipChildren="false">
 
     <ListView
+        android:id="@+id/list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/list"
-        tools:listitem="@layout/view_search_record"
-        android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="6dp"
+        android:layout_marginRight="6dp"
         android:divider="@android:color/transparent"
-        android:dividerHeight="10.0dp"/>
+        android:dividerHeight="10.0dp"
+        android:scrollingCache="false"
+        tools:listitem="@layout/view_search_record"/>
 
 
 </RelativeLayout>

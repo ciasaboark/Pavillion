@@ -1,26 +1,8 @@
 package io.phobotic.pavillion.prefs;
 
-import android.annotation.TargetApi;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.res.Configuration;
-import android.os.Build;
-import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
-import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
-import android.support.v7.app.AlertDialog;
-import android.text.InputType;
-import android.view.MenuItem;
-import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.Toast;
-
-import io.phobotic.pavillion.R;
-import io.phobotic.pavillion.SettingsActivity;
-import io.phobotic.pavillion.prefs.Preferences;
 
 /**
  * Created by Jonathan Nelson on 8/27/16.

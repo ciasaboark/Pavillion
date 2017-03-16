@@ -21,12 +21,6 @@
     <!-- Email settings -->
     <string name="pref_header_email">Email</string>
 
-    <string name="pref_email_autosend_title">Send email updates</string>
-    <string name="pref_email_autosend_summary">Automatically send updates for searched locations</string>
-
-    <string name="pref_email_time_title">Email schedule</string>
-    <string name="pref_email_time_summary">Set time and day emails will be sent</string>
-
     <string name="pref_email_server_title">Server address</string>
     <string name="pref_email_port_title">Server port number</string>
     <string name="pref_email_username_title">Email username</string>
@@ -46,17 +40,18 @@
     <string name="pref_email_send_now_summary">Send all unsent records</string>
 
 
-    <string name="pref_email_key_autosend">email.autosend</string>
     <string name="pref_email_key_time">email.time</string>
     <string name="pref_email_key_days">email.days</string>
     <string name="pref_email_key_server">email.server</string>
     <string name="pref_email_key_port">email.port</string>
     <string name="pref_email_key_subject">email.subject</string>
+    <!-- old recipients storage format, now stored as json in pref_email_key_recipients_set-->
     <string name="pref_email_key_recipients">email.recipients</string>
+    <string name="pref_email_key_recipients_set">email.recipients.set</string>
     <string name="pref_email_key_password">email.password</string>
     <string name="pref_email_key_username">email.username</string>
     <string name="pref_email_key_test">email.test</string>
-    <string name="pref_email_key_send_now">email.send_now</string>
+    <!-- END Email Preferences -->
 
     <!-- Password Settings -->
     <string name="pref_header_password">Settings Password</string>
@@ -74,6 +69,46 @@
     <!-- Generic Button Strings -->
     <string name="button_save">Save</string>
     <string name="button_send">Send</string>
+    <string name="button_close">Close</string>
 
 
+    <!-- Records Preferences -->
+    <string name="pref_header_records">View Records</string>
+    <!-- END Records Preferences -->
+
+
+    <!-- Report preferences -->
+    <string name="pref_header_reports">Reports</string>
+    <string name="pref_group_daily_title">Daily Reports</string>
+    <string name="pref_group_weekly_title">Weekly Summaries</string>
+    <string name="pref_group_monthly_title">Monthly Summaries</string>
+
+    <!-- report keys -->
+    <string name="pref_report_daily">report.daily.send</string>
+    <string name="pref_report_weekly">report.weekly.send</string>
+    <string name="pref_report_monthly">report.monthly.send</string>
+    <string name="pref_report_daily_time">report.daily.time</string>
+    <string name="pref_report_daily_now_key">report.daily.now</string>
+    <string name="pref_report_weekly_now_key">report.weekly.now</string>
+    <string name="pref_report_monthly_now_key">report.monthly.now</string>
+
+
+    <!-- report preference strings -->
+    <string name="pref_report_daily_title">Enable daily reports</string>
+    <string name="pref_report_daily_summary">Daily report summary</string>
+    <string name="pref_report_daily_time_title">Set daily report schedule</string>
+    <string name="pref_report_daily_time_summary">Choose day and time to send daily report</string>
+    <string name="pref_report_daily_now_title">Send daily report now</string>
+    <string name="pref_report_daily_now_summary">Send all records that have not previously been sent</string>
+
+    <string name="pref_report_weekly_title">Enable weekly summaries</string>
+    <string name="pref_report_weekly_summary">Weekly report summary</string>
+    <string name="pref_report_weekly_now_title">Send weekly summary now</string>
+    <string name="pref_report_weekly_now_summary">Send usage report for the current week</string>
+
+    <string name="pref_report_monthly_title">Enable monthly summaries</string>
+    <string name="pref_report_monthly_summary">Monthly report summary</string>
+    <string name="pref_report_monthly_now_title">Send monthly summary now</string>
+    <string name="pref_report_monthly_now_summary">Send usage report for the current month</string>
+    <!-- END Report preferences -->
 </resources>

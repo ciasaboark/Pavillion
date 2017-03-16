@@ -2,12 +2,20 @@ package io.phobotic.pavillion.prefs;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.media.MediaDrm;
 import android.preference.PreferenceManager;
+import android.util.Log;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
+
 import io.phobotic.pavillion.R;
+import io.phobotic.pavillion.email.EmailRecipient;
 
 /**
  * Created by Jonathan Nelson on 5/29/16.
@@ -39,6 +47,7 @@ public class Preferences {
     public int getEmailPort() {
         String portString = sharedPreferences.getString(
                 context.getString(R.string.pref_email_key_port), "-1");
+        if (portString.equals("")) portString = "-1";
         return Integer.valueOf(portString);
     }
 
@@ -50,8 +59,72 @@ public class Preferences {
         return sharedPreferences.getString(context.getString(R.string.pref_email_key_password), null);
     }
 
-    public String getEmailRecipients() {
-        return sharedPreferences.getString(context.getString(R.string.pref_email_key_recipients), null);
+    /**
+     * This method will only be kept around for the next one or two version releases, after that
+     * it (and the key it references) will be removed.
+     */
+    @Deprecated
+    private void upgradeOldRecipientsList() {
+        List<EmailRecipient> emailRecipientList = new ArrayList<>();
+
+        String oldRecipients = sharedPreferences.getString(
+                context.getResources().getString(R.string.pref_email_key_recipients), null);
+        if (oldRecipients == null) {
+            Log.d(TAG, "Old recipients list not found, skipping conversion");
+        } else {
+            Log.d(TAG, "Converting old recipients list to new format");
+            try {
+                String[] recipients = oldRecipients.split(",");
+                for (String recipient : recipients) {
+                    EmailRecipient emailRecipient = new EmailRecipient(recipient);
+                    //Since the daily report was all that was available at the time email recipients
+                    //+ were stored in this format then all previously exisitng emails should receive
+                    //+ at least the daily report
+                    emailRecipient.setReceiveDailyReport(true);
+                    emailRecipientList.add(emailRecipient);
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "caught exception converting old recipients string to new list format.  " +
+                        "Old recipients list will be discarded and new empty list inserted");
+            }
+            sharedPreferences.edit().remove(context.getResources().getString(R.string.pref_email_key_recipients)).apply();
+            setEmailRecipients(emailRecipientList);
+        }
+    }
+
+    public List<EmailRecipient> getEmailRecipients() {
+        try {
+            upgradeOldRecipientsList();
+        } catch (Exception e) {
+            Log.e(TAG, "caught exception converting old recipients list: " + e.getMessage());
+        }
+
+        List<EmailRecipient> recipients = new ArrayList<>();
+        try {
+            String json = sharedPreferences.getString(context.getString(
+                    R.string.pref_email_key_recipients_set), "");
+            if (json.equals("")) {
+                throw new Exception("Found empty string when converting saved recipients list to " +
+                        "JSON.  This is normal if no recipients have been defined yet");
+            }
+
+            Type listType = new TypeToken<List<EmailRecipient>>() {
+            }.getType();
+            Gson gson = new Gson();
+            recipients = gson.fromJson(json, listType);
+        } catch (Exception e) {
+            Log.e(TAG, "Unable to parse recipients list string as JSON");
+        }
+
+        return recipients;
+    }
+
+    public void setEmailRecipients(List<EmailRecipient> recipients) {
+        Type listType = new TypeToken<List<EmailRecipient>>(){}.getType();
+        Gson gson = new Gson();
+        String json = gson.toJson(recipients, listType);
+        sharedPreferences.edit().putString(context.getString(
+                R.string.pref_email_key_recipients_set), json).apply();
     }
 
     public String getEmailSubject() {
@@ -172,9 +245,39 @@ public class Preferences {
         }
     }
 
+    /**
+     * Returns true if _any_ email report will be sent out
+     */
     public boolean shouldEmailsBeSent() {
-        boolean shouldEmailsBeSent = sharedPreferences.getBoolean(context.getString(R.string.pref_email_key_autosend), false);
-        return shouldEmailsBeSent;
+        boolean dailyReportsEnabled = sharedPreferences.getBoolean(
+                context.getString(R.string.pref_report_daily), false);
+        boolean weeklyReportsEnabled = sharedPreferences.getBoolean(
+                context.getString(R.string.pref_report_daily), false);
+        boolean monthlyReportsEnabled = sharedPreferences.getBoolean(
+                context.getString(R.string.pref_report_daily), false);
+
+        return dailyReportsEnabled || weeklyReportsEnabled || monthlyReportsEnabled;
+    }
+
+    public boolean shouldDailyReportsBeSent() {
+        boolean dailyReportsEnabled = sharedPreferences.getBoolean(
+                context.getString(R.string.pref_report_daily), false);
+
+        return dailyReportsEnabled;
+    }
+
+    public boolean shouldWeeklyReportsBeSent() {
+        boolean weeklyReportsEnabled = sharedPreferences.getBoolean(
+                context.getString(R.string.pref_report_weekly), false);
+
+        return weeklyReportsEnabled;
+    }
+
+    public boolean shouldMonthlyReportsBeSent() {
+        boolean monthlyReportsEnabled = sharedPreferences.getBoolean(
+                context.getString(R.string.pref_report_monthly), false);
+
+        return monthlyReportsEnabled;
     }
 
     public void setEmailTime(String syncTime) {

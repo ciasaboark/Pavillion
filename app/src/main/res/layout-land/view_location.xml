@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
+    android:id="@+id/card_digits"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
-    android:id="@+id/card_digits"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_below="@+id/location_input"
     android:layout_margin="8dp"
-    android:clickable="true">
+    android:clickable="true"
+    android:orientation="vertical">
 
     <TextView
         android:id="@+id/cd_location"
@@ -16,10 +16,10 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
+        android:text="Location"
         android:textColor="?android:attr/textColorSecondary"
         android:textSize="@dimen/card_location_text_height"
-        android:textStyle="bold"
-        android:text="Location"/>
+        android:textStyle="bold"/>
 
     <LinearLayout
         android:id="@+id/rotating_digits"
@@ -28,25 +28,25 @@
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:layout_gravity="center_horizontal"
-        android:gravity="center"
         android:layout_marginRight="@dimen/card_location_padding"
+        android:gravity="center"
         android:orientation="horizontal">
 
         <TextView
             android:id="@+id/cd_main"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="?android:attr/textColorPrimary"
-            android:textSize="@dimen/card_main_text_height"
-            android:textStyle="bold"
-            android:text="M"
-            android:gravity="center_vertical"
             android:layout_alignBaseline="@+id/cd_location"
             android:layout_alignBottom="@+id/cd_location"
             android:layout_toLeftOf="@+id/rotating_digits"
             android:layout_toStartOf="@+id/rotating_digits"
             android:layout_weight="1"
-            android:paddingRight="100dp"/>
+            android:gravity="center_vertical"
+            android:paddingRight="100dp"
+            android:text="M"
+            android:textColor="?android:attr/textColorPrimary"
+            android:textSize="@dimen/card_main_text_height"
+            android:textStyle="bold"/>
 
         <TextView
             android:id="@+id/cd_left"
@@ -56,11 +56,11 @@
             android:gravity="end"
             android:paddingRight="16dp"
             android:paddingTop="@dimen/card_rotate_text_height"
+            android:text="44"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="?android:attr/textColorSecondary"
             android:textSize="@dimen/card_rotate_text_height"
             android:textStyle="bold"
-            android:text="44"
             />
 
         <TextView
@@ -69,11 +69,11 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:gravity="end"
+            android:text="44"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="?android:attr/textColorSecondary"
             android:textSize="@dimen/card_rotate_text_height"
             android:textStyle="bold"
-            android:text="44"
             />
 
         <TextView
@@ -84,11 +84,11 @@
             android:gravity="end"
             android:paddingLeft="16dp"
             android:paddingTop="@dimen/card_rotate_text_height"
+            android:text="44"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="?android:attr/textColorSecondary"
             android:textSize="@dimen/card_rotate_text_height"
             android:textStyle="bold"
-            android:text="44"
             />
     </LinearLayout>
 </RelativeLayout>

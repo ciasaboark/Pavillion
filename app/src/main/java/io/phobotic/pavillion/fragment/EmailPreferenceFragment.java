@@ -2,11 +2,9 @@ package io.phobotic.pavillion.fragment;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.app.AlarmManager;
-import android.app.DialogFragment;
 import android.app.Fragment;
+import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -19,15 +17,10 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.view.MenuItem;
 
-import java.util.List;
-
-import io.phobotic.pavillion.prefs.PreferenceBinder;
 import io.phobotic.pavillion.R;
-import io.phobotic.pavillion.SettingsActivity;
-import io.phobotic.pavillion.database.SearchRecord;
-import io.phobotic.pavillion.database.SearchesDatabase;
+import io.phobotic.pavillion.activity.SettingsActivity;
 import io.phobotic.pavillion.email.EmailSender;
-import io.phobotic.pavillion.service.EmailSenderService;
+import io.phobotic.pavillion.prefs.PreferenceBinder;
 
 /**
  * This fragment shows general preferences only. It is used when the
@@ -72,13 +65,11 @@ public class EmailPreferenceFragment extends PreferenceFragment {
         Preference subject = findPreference(getString(R.string.pref_email_key_subject));
         PreferenceBinder.bindPreferenceSummaryToValue(subject);
 
-        Preference recipients = findPreference(getString(R.string.pref_email_key_recipients));
-        PreferenceBinder.bindPreferenceSummaryToValue(recipients);
-
-        Preference timeButton = findPreference(getString(R.string.pref_email_key_time));
-        timeButton.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+        Preference recipients = findPreference(getString(R.string.pref_email_key_recipients_set));
+        recipients.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
+                FragmentManager fm = getFragmentManager();
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
                 Fragment prev = getFragmentManager().findFragmentByTag("dialog");
                 if (prev != null) {
@@ -87,11 +78,14 @@ public class EmailPreferenceFragment extends PreferenceFragment {
                 ft.addToBackStack(null);
 
                 // Create and show the dialog.
-                DialogFragment newFragment = DayTimeFragment.newInstance();
+                EmailRecipientsFragment newFragment = EmailRecipientsFragment.newInstance();
                 newFragment.show(ft, "dialog");
-                return false;
+
+                return true;
             }
         });
+
+
 
         Preference testButton = findPreference(getString(R.string.pref_email_key_test));
         testButton.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -107,13 +101,13 @@ public class EmailPreferenceFragment extends PreferenceFragment {
                                 EmailSender emailSender = new EmailSender(context)
                                         .setFailedListener(new EmailSender.EmailStatusListener() {
                                             @Override
-                                            public void onEmailSendResult(Object tag) {
+                                            public void onEmailSendResult(final String message, Object tag) {
                                                 ((Activity)context).runOnUiThread(new Runnable() {
                                                     @Override
                                                     public void run() {
                                                         AlertDialog failDialog = new AlertDialog.Builder(context)
                                                                 .setTitle("Email Failed")
-                                                                .setMessage("Test email could not be sent")
+                                                                .setMessage("Test email could not be sent\n" + message)
                                                                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                                                                     @Override
                                                                     public void onClick(DialogInterface dialogInterface, int i) {
@@ -128,7 +122,7 @@ public class EmailPreferenceFragment extends PreferenceFragment {
                                         }, null)
                                         .setSuccessListener(new EmailSender.EmailStatusListener() {
                                             @Override
-                                            public void onEmailSendResult(Object tag) {
+                                            public void onEmailSendResult(String message, Object tag) {
                                                 ((Activity)context).runOnUiThread(new Runnable() {
                                                     @Override
                                                     public void run() {
@@ -155,58 +149,6 @@ public class EmailPreferenceFragment extends PreferenceFragment {
                                 dialog.dismiss();
                             }
                         }).show();
-                return false;
-            }
-        });
-
-        Preference sendNow = findPreference(getString(R.string.pref_email_key_send_now));
-        sendNow.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                final Context context = getActivity();
-
-                final SearchesDatabase db = SearchesDatabase.getInstance(context);
-                final List<SearchRecord> records = db.getUnsentSearches();
-                if (records.size() == 0) {
-                    AlertDialog noRecordsDialog = new AlertDialog.Builder(context)
-                            .setTitle("No Records")
-                            .setMessage("There are no unsent records in the database")
-                            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    dialogInterface.dismiss();
-                                }
-                            }).show();
-                } else {
-                    AlertDialog sendNowDialog = new AlertDialog.Builder(context)
-                            .setTitle("Send records")
-                            .setMessage("There are " + records.size() + " unsent records in " +
-                                    "the database.  Send them now?")
-                            .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    dialogInterface.dismiss();
-                                }
-                            })
-                            .setPositiveButton(R.string.button_send, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    Intent intent = new Intent(context, EmailSenderService.class);
-                                    intent.putExtra(EmailSenderService.FORCE_SEND, true);
-                                    PendingIntent pi = PendingIntent.getService(context, 0,
-                                            intent, 0);
-                                    AlarmManager alarmManager =(AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                                        alarmManager.setExact(AlarmManager.RTC_WAKEUP,
-                                                System.currentTimeMillis(), pi);
-                                    } else {
-                                        alarmManager.set(AlarmManager.RTC_WAKEUP,
-                                                System.currentTimeMillis(), pi);
-                                    }
-                                }
-                            })
-                            .show();
-                }
                 return false;
             }
         });

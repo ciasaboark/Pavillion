@@ -5,8 +5,6 @@ import android.content.Intent;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
 /**
  * Created by Jonathan Nelson on 8/25/16.
  */

@@ -8,7 +8,7 @@
     android:layout_height="match_parent"
     android:clipChildren="false"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="io.phobotic.pavillion.MainActivity"
+    tools:context="io.phobotic.pavillion.activity.MainActivity"
     tools:showIn="@layout/app_bar_main"
     >
 
@@ -62,14 +62,14 @@
 
 
     <io.phobotic.pavillion.view.LocationCard
+        android:id="@+id/location_card"
+        style="@style/CheckDigitCardStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/location_card"
-        android:visibility="invisible"
         android:layout_below="@id/location_input"
+        android:layout_margin="6dp"
         android:stateListAnimator="@animator/lift_on_touch"
-        style="@style/CheckDigitCardStyle"
-        android:layout_margin="6dp"></io.phobotic.pavillion.view.LocationCard>
+        android:visibility="invisible"></io.phobotic.pavillion.view.LocationCard>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"

@@ -2,20 +2,16 @@ package io.phobotic.pavillion.email;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
-import java.io.File;
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
+import javax.mail.Address;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
@@ -27,9 +23,6 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
-import io.phobotic.pavillion.converter.ExcelConverter;
-import io.phobotic.pavillion.database.SearchRecord;
-import io.phobotic.pavillion.database.SearchesDatabase;
 import io.phobotic.pavillion.prefs.Preferences;
 
 /**
@@ -48,6 +41,19 @@ public class EmailSender {
     private List<Attachment> attachments;
     private Object successTag;
     private Object failedTag;
+
+    private String subject = "";
+    private String body = "";
+
+    public EmailSender setSubject(String subject) {
+        this.subject = subject;
+        return this;
+    }
+
+    public EmailSender setBody(String body) {
+        this.body = body;
+        return this;
+    }
 
     public EmailSender(Context context) {
         this.context = context;
@@ -71,7 +77,7 @@ public class EmailSender {
     }
 
     public interface EmailStatusListener {
-        void onEmailSendResult(Object tag);
+        void onEmailSendResult(@Nullable String message, @Nullable Object tag);
     }
 
     private void notifyStart() {
@@ -84,16 +90,16 @@ public class EmailSender {
         Intent i = new Intent(EMAIL_SEND_SUCCESS);
         LocalBroadcastManager.getInstance(context).sendBroadcast(i);
         if (successListener != null) {
-            successListener.onEmailSendResult(successTag);
+            successListener.onEmailSendResult(null, successTag);
         }
     }
 
-    private void notifyFail() {
+    private void notifyFail(String message) {
         //send broadcast notification
         Intent i = new Intent(EMAIL_SEND_FAILED);
         LocalBroadcastManager.getInstance(context).sendBroadcast(i);
         if (failedListener != null) {
-            failedListener.onEmailSendResult(failedTag);
+            failedListener.onEmailSendResult(message, failedTag);
         }
     }
 
@@ -104,11 +110,13 @@ public class EmailSender {
             int port = prefs.getEmailPort();
             String username = prefs.getEmailUsername();
             String password = prefs.getEmailPassword();
-            String recipients = prefs.getEmailRecipients();
-            DateFormat df = SimpleDateFormat.getDateInstance();
-            String dateString = df.format(new Date());
-            String subject = "Check Digit Lookups for " + dateString;
-            String body = "Location check digit lookups for " + dateString;
+            List<EmailRecipient> recipientList = prefs.getEmailRecipients();
+            String recipients = "";
+            String prefix = "";
+            for (EmailRecipient recipient: recipientList) {
+                recipients += prefix + recipient.getEmail();
+                prefix = ",";
+            }
 
             Email email = new Email()
                     .setServer(server)
@@ -119,21 +127,21 @@ public class EmailSender {
                     .setSubject(subject)
                     .setBody(body);
 
-            SearchesDatabase db = SearchesDatabase.getInstance(context);
-            List<SearchRecord> records = db.getUnsentSearches();
-            Attachment attachment = null;
-
-            ExcelConverter converter = new ExcelConverter(context, records);
-            File file = converter.convert();
-            attachment = new Attachment(file, file.getName());
-            email.addAttachment(attachment);
+            if (attachments == null) {
+                Log.d(TAG, "no attachments given");
+            } else {
+                for (Attachment attachment : attachments) {
+                    email.addAttachment(attachment);
+                }
+            }
 
             EmailSendTask emailSendTask = new EmailSendTask();
             emailSendTask.execute(email);
         } catch (Exception e) {
-            Log.e(TAG, "Caught exception while trying to send email: " + e.getMessage());
+            String message = "Caught exception while trying to send email: " + e.getMessage();
+            Log.e(TAG, message);
             e.printStackTrace();
-            notifyFail();
+            notifyFail(message);
         }
 
 
@@ -148,7 +156,13 @@ public class EmailSender {
             int port = prefs.getEmailPort();
             String username = prefs.getEmailUsername();
             String password = prefs.getEmailPassword();
-            String recipients = prefs.getEmailRecipients();
+            List<EmailRecipient> recipientList = prefs.getEmailRecipients();
+            String recipients = "";
+            String prefix = "";
+            for (EmailRecipient recipient: recipientList) {
+                recipients += prefix + recipient.getEmail();
+                prefix = ",";
+            }
 
             Email email = new Email()
                     .setServer(server)
@@ -162,9 +176,10 @@ public class EmailSender {
             EmailSendTask emailSendTask = new EmailSendTask();
             emailSendTask.execute(email);
         } catch (Exception e) {
-            Log.d(TAG, "Caught excption while sending test email: " + e.getMessage());
+            String message = "Caught exception while sending test email: " + e.getMessage();
+            Log.d(TAG, message);
             e.printStackTrace();
-            notifyFail();
+            notifyFail(message);
         }
 
         return this;
@@ -176,9 +191,10 @@ public class EmailSender {
             notifyStart();
             for (Email email: emails) {
                 if (!email.isValid()) {
-                    Log.d(TAG, "Unable to send email. One or more of server, port, username, or password " +
-                            "has not been set in settings");
-                    notifyFail();
+                    String message = "Unable to send email. One or more of server, port, username, or password " +
+                            "has not been set in settings";
+                    Log.d(TAG, message);
+                    notifyFail(message);
                 } else {
                     Properties props = new Properties();
                     props.put("mail.smtp.user", email.getUsername());
@@ -202,7 +218,6 @@ public class EmailSender {
                         String fromAddress = "\"Check Digit Lookups\" <" + email.getUsername() + ">";
                         emailMessage.setFrom(new InternetAddress(fromAddress));
                         emailMessage.setSubject(email.getSubject());
-                        Message message = new MimeMessage(mailSession);
                         Multipart multipart = new MimeMultipart();
                         MimeBodyPart messageBodyPart = new MimeBodyPart();
                         messageBodyPart.setContent(email.getBody(), "text/plain");
@@ -218,23 +233,30 @@ public class EmailSender {
                             }
                         }
 
+                        Address[] recipients = emailMessage.getAllRecipients();
+                        if (recipients == null) {
+                            throw new AddressException("No recipients defined");
+                        }
+
                         emailMessage.setContent(multipart);
 
                         Transport transport = mailSession.getTransport("smtps");
                         transport.connect(email.getServer(), email.getUsername(), email.getPassword());
-                        transport.sendMessage(emailMessage, emailMessage.getAllRecipients());
+                        transport.sendMessage(emailMessage, recipients);
                         transport.close();
 
                         Log.d(TAG, "email sent");
                         notifySuccess();
                     } catch (AddressException e) {
                         e.printStackTrace();
-                        Log.e(TAG, "email could not be sent: " + e.getMessage());
-                        notifyFail();
+                        String message = e.getMessage();
+                        Log.e(TAG, message);
+                        notifyFail(message);
                     } catch (MessagingException e) {
                         e.printStackTrace();
-                        Log.e(TAG, "email could not be sent: " + e.getMessage());
-                        notifyFail();
+                        String message = e.getMessage();
+                        Log.e(TAG, message);
+                        notifyFail(message);
                     }
                 }
             }

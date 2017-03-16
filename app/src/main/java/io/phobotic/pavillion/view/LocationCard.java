@@ -7,7 +7,6 @@ import android.view.View;
 import android.widget.TextView;
 
 import io.phobotic.pavillion.R;
-import io.phobotic.pavillion.checkdigit.CheckDigit;
 import io.phobotic.pavillion.checkdigit.CheckDigits;
 
 /**
@@ -23,8 +22,7 @@ public class LocationCard extends CardView {
     private TextView rightCheckdigit;
 
     public LocationCard(Context context) {
-        super(context);
-        init();
+        this(context, null);
     }
 
     public LocationCard(Context context, AttributeSet attrs) {

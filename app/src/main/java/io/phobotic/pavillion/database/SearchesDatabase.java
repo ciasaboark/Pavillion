@@ -8,6 +8,7 @@ import android.util.Log;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import io.phobotic.pavillion.prefs.Preferences;
@@ -37,6 +38,9 @@ public class SearchesDatabase {
     private static final int DB_PROJECTION_CD_RIGHT = 6;
     private static final int DB_PROJECTION_PIC_FILE = 7;
     private static final int DB_PROJECTION_NOTIFICATION_SENT = 8;
+
+    private static final int DB_MAX_RECORD_AGE = 365;
+    private static final int DB_MAX_PHOTO_AGE = 30;
     private static SearchesDatabase instance;
     private final SQLiteDatabase db;
     private Context context;
@@ -80,17 +84,25 @@ public class SearchesDatabase {
         int prunedPics = 0;
 
         Preferences prefs = Preferences.getInstance(context);
-        long MS_SECOND = 1000;
-        long MS_MIN = MS_SECOND * 60;
-        long MS_HOUR = MS_MIN * 60;
-        long MS_DAY = MS_HOUR * 24;
-        long MS_MONTH = MS_DAY * 31;
-        long maxSearch = 1000 * 60 * 60 * 24 * 31;
-        long maxSearchAge = MS_MONTH;
-        long maxPicAge = MS_MONTH;
-        //query based off the shortest age
-        long offset = maxSearchAge > maxPicAge ? maxPicAge : maxSearchAge;
-        long timestamp = System.currentTimeMillis() - offset;
+
+        //delete records older than 365 days
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.add(Calendar.DATE, -DB_MAX_RECORD_AGE);
+        long yearRecords = calendar.getTimeInMillis();
+
+        //delete photos older than 30 days
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.add(Calendar.DATE, -DB_MAX_PHOTO_AGE);
+        long monthRecords = calendar.getTimeInMillis();
+
+        deleteRecordsOlderThan(yearRecords);
+        deletePhotosOlderThan(monthRecords);
+    }
+
+    private int deleteRecordsOlderThan(long timestamp) {
+        int deletedRecords = 0;
+        int deletedPhotos = 0;
         Cursor cursor = null;
 
         try {
@@ -103,30 +115,49 @@ public class SearchesDatabase {
                 boolean deleteFile = false;
                 boolean deleteRecord = false;
 
-                if (recordAge > maxPicAge) {
-                    deleteFile = true;
+                if (deleteFileIfExists(picfile)) {
+                    deletedPhotos++;
                 }
-
-                if (recordAge > maxSearchAge) {
-                    deleteFile = true;
-                    deleteRecord = true;
-                }
-
-                if (deleteFile && picfile != null && !picfile.equals("")) {
-                    deleteFileIfExists(picfile);
-                    prunedPics++;
-                }
-                if (deleteRecord) {
-                    deleteSearchWithId(id);
-                    prunedSearches++;
-                }
+                deleteSearchWithId(id);
+                deletedRecords++;
             }
 
-            Log.d(TAG, "deleted " + prunedSearches + " search records and " + prunedPics + " photos");
+            Log.d(TAG, "deleted " + deletedRecords + " search records and " +
+                    deletedPhotos + " photos");
         } catch (Exception e) {
             Log.e(TAG, "caught exception while pruning old records from searches database: " + e.getMessage());
             e.printStackTrace();
         }
+
+        return deletedRecords;
+    }
+
+    private int deletePhotosOlderThan(long timestamp) {
+        int deletedPhotos = 0;
+        Cursor cursor = null;
+
+        try {
+            cursor = getOldSearchesCursor(timestamp);
+            while (cursor.moveToNext()) {
+                int id = cursor.getInt(DB_PROJECTION_ID);
+                long recordTimestamp = cursor.getLong(DB_PROJECTION_TIMESTAMP);
+                String picfile = cursor.getString(DB_PROJECTION_PIC_FILE);
+                long recordAge = System.currentTimeMillis() - recordTimestamp;
+                boolean deleteFile = false;
+                boolean deleteRecord = false;
+
+                if (deleteFileIfExists(picfile)) {
+                    deletedPhotos++;
+                }
+            }
+
+            Log.d(TAG, "deleted " + deletedPhotos + " photos");
+        } catch (Exception e) {
+            Log.e(TAG, "caught exception while pruning old photos from file system: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return deletedPhotos;
     }
 
     private Cursor getOldSearchesCursor(long timestamp) {
@@ -137,15 +168,19 @@ public class SearchesDatabase {
         return cursor;
     }
 
-    private void deleteFileIfExists(String filename) {
+    private boolean deleteFileIfExists(String filename) {
+        boolean fileDeleted = false;
         try {
             File f = new File(filename);
             if (f.exists()) {
                 f.delete();
+                fileDeleted = true;
             }
         } catch (Exception e) {
             Log.e(TAG, "caught exception while deleting old photo in file '" + filename + "': " + e.getMessage());
         }
+
+        return fileDeleted;
     }
 
     private void deleteSearchWithId(int id) {
@@ -169,8 +204,43 @@ public class SearchesDatabase {
                 SQLiteDatabase.CONFLICT_REPLACE);
         Log.d(TAG, "inserted search for " + instance.getLocation() + " at time: " +
                 instance.getTimestamp() + " as row " + rowID);
-        return rowID;
 
+        return rowID;
+    }
+
+    public List<SearchRecord> getRecordsBetween(long start, long end) {
+        List<SearchRecord> records = new ArrayList<>();
+        String [] args = {String.valueOf(start), String.valueOf(end)};
+        String selection = Columns.TIMESTAMP + " BETWEEN ? AND  ?";
+        Cursor cursor;
+        try {
+            cursor = db.query(SearchesDatabaseOpenHelper.TABLE_NAME, null, selection, args,
+                    null, null, Columns.TIMESTAMP, null);
+            if (cursor.getCount() == 0) {
+                Log.d(TAG, "Query finished OK, but no records found");
+            } else {
+                while (cursor.moveToNext()) {
+                    int id = cursor.getInt(DB_PROJECTION_ID);
+                    long timestamp = cursor.getLong(DB_PROJECTION_TIMESTAMP);
+                    String location = cursor.getString(DB_PROJECTION_LOCATION);
+                    String cdMain = cursor.getString(DB_PROJECTION_CD_MAIN);
+                    String cdLeft = cursor.getString(DB_PROJECTION_CD_LEFT);
+                    String cdMid = cursor.getString(DB_PROJECTION_CD_MID);
+                    String cdRight = cursor.getString(DB_PROJECTION_CD_RIGHT);
+                    String picFilename = cursor.getString(DB_PROJECTION_PIC_FILE);
+                    File picFile = new File(picFilename);
+
+                    SearchRecord searchRecord = new SearchRecord(id, timestamp, location, cdMain, cdLeft, cdMid, cdRight, picFile);
+                    records.add(searchRecord);
+                }
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Caught exception while building list of records between " + start +
+                    " and " + end + ": " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return records;
     }
 
     public List<SearchRecord> getUnsentSearches() {
@@ -200,6 +270,7 @@ public class SearchesDatabase {
             Log.e(TAG, "Caught exception while building list of unsent searches: " + e.getMessage());
             e.printStackTrace();
         }
+
         return records;
     }
 

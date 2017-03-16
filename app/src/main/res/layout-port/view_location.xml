@@ -1,100 +1,101 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
+    android:id="@+id/card_digits"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
-    android:id="@+id/card_digits"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_below="@+id/location_input"
     android:layout_margin="16dp"
     android:clickable="true"
+    android:orientation="vertical"
     >
 
 
-        <TextView
-            android:id="@+id/cd_location"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="?android:attr/textColorSecondary"
-            android:textSize="@dimen/card_location_text_height"
-            android:textStyle="bold"
-            android:text="Location"
-            android:layout_centerHorizontal="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginLeft="28dp"
-            android:layout_marginStart="28dp"/>
+    <TextView
+        android:id="@+id/cd_location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginLeft="28dp"
+        android:layout_marginStart="28dp"
+        android:text="Location"
+        android:textColor="?android:attr/textColorSecondary"
+        android:textSize="@dimen/card_location_text_height"
+        android:textStyle="bold"/>
 
-        <RelativeLayout
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/cd_location">
+
+        <LinearLayout
+            android:id="@+id/rotating_digits"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/cd_location">
-            <LinearLayout
-                android:id="@+id/rotating_digits"
-                android:layout_width="match_parent"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginRight="@dimen/card_location_padding"
+            android:orientation="horizontal"
+            >
+
+            <TextView
+                android:id="@+id/cd_main"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
+                android:layout_centerHorizontal="false"
                 android:layout_centerVertical="true"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginRight="@dimen/card_location_padding"
-                android:orientation="horizontal"
-                >
+                android:layout_weight="1"
+                android:text="M"
+                android:textColor="?android:attr/textColorPrimary"
+                android:textSize="@dimen/card_main_text_height"
+                android:textStyle="bold"
+                />
 
-                <TextView
-                    android:id="@+id/cd_main"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="@dimen/card_main_text_height"
-                    android:textStyle="bold"
-                    android:text="M"
-                    android:layout_weight="1"
-                    android:layout_centerHorizontal="false"
-                    />
+            <TextView
+                android:id="@+id/cd_left"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:gravity="end"
+                android:paddingRight="16dp"
+                android:paddingTop="@dimen/card_rotate_text_height"
+                android:text="44"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="?android:attr/textColorSecondary"
+                android:textSize="@dimen/card_rotate_text_height"
+                android:textStyle="bold"
+                />
 
-                <TextView
-                    android:id="@+id/cd_left"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    android:gravity="end"
-                    android:paddingRight="16dp"
-                    android:paddingTop="@dimen/card_rotate_text_height"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:textColor="?android:attr/textColorSecondary"
-                    android:textSize="@dimen/card_rotate_text_height"
-                    android:textStyle="bold"
-                    android:text="44"
-                    />
+            <TextView
+                android:id="@+id/cd_middle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:gravity="end"
+                android:text="44"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="?android:attr/textColorSecondary"
+                android:textSize="@dimen/card_rotate_text_height"
+                android:textStyle="bold"
+                />
 
-                <TextView
-                    android:id="@+id/cd_middle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    android:gravity="end"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:textColor="?android:attr/textColorSecondary"
-                    android:textSize="@dimen/card_rotate_text_height"
-                    android:textStyle="bold"
-                    android:text="44"
-                    />
-
-                <TextView
-                    android:id="@+id/cd_right"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    android:gravity="end"
-                    android:paddingLeft="16dp"
-                    android:paddingTop="@dimen/card_rotate_text_height"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:textColor="?android:attr/textColorSecondary"
-                    android:textSize="@dimen/card_rotate_text_height"
-                    android:textStyle="bold"
-                    android:text="44"
-                    />
-            </LinearLayout>
-        </RelativeLayout>
+            <TextView
+                android:id="@+id/cd_right"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:gravity="end"
+                android:paddingLeft="16dp"
+                android:paddingTop="@dimen/card_rotate_text_height"
+                android:text="44"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="?android:attr/textColorSecondary"
+                android:textSize="@dimen/card_rotate_text_height"
+                android:textStyle="bold"
+                />
+        </LinearLayout>
+    </RelativeLayout>
 </RelativeLayout>

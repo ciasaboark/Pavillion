@@ -15,8 +15,12 @@
     <header
         android:fragment="io.phobotic.pavillion.fragment.RecordsPreferenceFragment"
         android:icon="@drawable/ic_magnify_black_24dp"
-        android:title="View Records" />
+        android:title="@string/pref_header_records"/>
 
+    <header
+        android:fragment="io.phobotic.pavillion.fragment.ReportsPreferenceFragment"
+        android:icon="@drawable/ic_file_chart_black_24dp"
+        android:title="@string/pref_header_reports"/>
 
 
 </preference-headers>

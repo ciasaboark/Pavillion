@@ -12,7 +12,7 @@ public class LeftCheckdigit extends CheckDigit {
     private String[] checkdigits = {"11", "12", "13", "14", "15", "16", "17", "18",
             "19", "20", "21", "22", "23", "24", "25", "26", "27", "30", "31", "32",
             "33", "35", "37", "38", "39", "40", "42", "43", "44"};
-    private int[] multiples = { 1, 2, 3, 4, 5, 6, 7, 10};
+    private int[] multiples = { 1, 2, 3, 4, 5, 6, 7, 8}; //TODO multiple at index 7 is not verified
     private String checkdigit;
 
     public LeftCheckdigit(@NonNull String location) throws java.text.ParseException {

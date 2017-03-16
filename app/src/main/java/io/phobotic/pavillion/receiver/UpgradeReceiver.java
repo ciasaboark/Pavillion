@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.util.Log;
 
 import io.phobotic.pavillion.BuildConfig;
-import io.phobotic.pavillion.MainActivity;
+import io.phobotic.pavillion.activity.MainActivity;
 import io.phobotic.pavillion.schedule.EmailScheduler;
 
 /**

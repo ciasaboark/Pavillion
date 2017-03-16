@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+
+    <RelativeLayout
+        android:id="@+id/box"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:padding="16dp">
+
+        <Button
+            android:id="@+id/add"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:background="?selectableItemBackgroundBorderless"
+            android:drawableLeft="@drawable/ic_account_plus_white_24dp"
+            android:drawablePadding="8dp"
+            android:drawableTint="@color/colorAccent"
+            android:text="Add"/>
+
+        <EditText
+            android:id="@+id/emailText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/add"
+            android:layout_toStartOf="@+id/add"
+            android:ems="10"
+            android:inputType="textEmailAddress"/>
+    </RelativeLayout>
+
+    <io.phobotic.pavillion.view.EmailAddressList
+        android:id="@+id/emailList"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/box">
+
+    </io.phobotic.pavillion.view.EmailAddressList>
+
+</RelativeLayout>

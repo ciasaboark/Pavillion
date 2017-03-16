@@ -11,4 +11,22 @@
 
     <color name="preview_shadow_background">#ce000000</color>
     <color name="preview_close_button">#262626</color>
+    <color name="preview_background">#d117ed</color>
+
+    <color name="record_unsent_text">#a6000000</color>
+    <color name="record_unsent_background">#ffffff</color>
+
+    <color name="record_sent_text">#7b000000</color>
+    <color name="record_sent_background">#e6e6e6</color>
+
+    <color name="graph_fill">#cd8bc34a</color>
+    <color name="graph_vertex">#62ffc400</color>
+
+    <color name="saved_email_background">@android:color/background_light</color>
+    <color name="new_email_background">#838bc34a</color>
+
+    <color name="icons">#000000</color>
+    <color name="icons_disabled">#7e000000</color>
+
+    <color name="primary_text_disabled_light">#8a000000</color>
 </resources>

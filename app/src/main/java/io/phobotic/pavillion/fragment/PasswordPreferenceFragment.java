@@ -16,7 +16,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import io.phobotic.pavillion.R;
-import io.phobotic.pavillion.SettingsActivity;
+import io.phobotic.pavillion.activity.SettingsActivity;
 import io.phobotic.pavillion.prefs.Preferences;
 
 /**

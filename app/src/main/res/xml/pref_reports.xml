@@ -1,0 +1,61 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        android:key="pref_group_daily_key"
+        android:title="@string/pref_group_daily_title">
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="@string/pref_report_daily"
+            android:summary="@string/pref_report_daily_summary"
+            android:title="@string/pref_report_daily_title"/>
+
+        <!-- choose time to send daily email -->
+        <Preference
+            android:key="@string/pref_report_daily_time"
+            android:summary="@string/pref_report_daily_time_summary"
+            android:title="@string/pref_report_daily_time_title"/>
+
+        <!-- button to send daily email now -->
+        <Preference
+            android:icon="@drawable/ic_send_black_24dp"
+            android:key="@string/pref_report_daily_now_key"
+            android:summary="@string/pref_report_daily_now_summary"
+            android:title="@string/pref_report_daily_now_title"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="pref_group_weekly_key"
+        android:title="@string/pref_group_weekly_title">
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="@string/pref_report_weekly"
+            android:summary="@string/pref_report_weekly_summary"
+            android:title="@string/pref_report_weekly_title"/>
+
+        <!-- button to send weekly email now -->
+        <Preference
+            android:icon="@drawable/ic_send_black_24dp"
+            android:key="@string/pref_report_weekly_now_key"
+            android:summary="@string/pref_report_weekly_now_summary"
+            android:title="@string/pref_report_weekly_now_title"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="pref_group_monthly_key"
+        android:title="@string/pref_group_monthly_title">
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="@string/pref_report_monthly"
+            android:summary="@string/pref_report_monthly_summary"
+            android:title="@string/pref_report_monthly_title"/>
+
+        <!-- button to send monthly email now -->
+        <Preference
+            android:icon="@drawable/ic_send_black_24dp"
+            android:key="@string/pref_report_monthly_now_key"
+            android:summary="@string/pref_report_monthly_now_summary"
+            android:title="@string/pref_report_monthly_now_title"/>
+    </PreferenceCategory>
+
+
+</PreferenceScreen>

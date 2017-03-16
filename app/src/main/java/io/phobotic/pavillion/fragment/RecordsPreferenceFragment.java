@@ -1,42 +1,32 @@
 package io.phobotic.pavillion.fragment;
 
 
-import android.app.Dialog;
-import android.content.Context;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
-import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
 import android.support.v7.app.AlertDialog;
-import android.text.Layout;
 import android.util.Log;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.R.color;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import io.phobotic.pavillion.adapter.RecordsCursorAdapter;
 import io.phobotic.pavillion.R;
+import io.phobotic.pavillion.adapter.RecordsCursorAdapter;
 import io.phobotic.pavillion.database.Columns;
 import io.phobotic.pavillion.database.SearchesDatabase;
-
-import static android.content.Context.LAYOUT_INFLATER_SERVICE;
-import static android.content.Context.WINDOW_SERVICE;
 
 
 /**

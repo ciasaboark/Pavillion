@@ -13,10 +13,8 @@ public class CheckDigitFactory {
         try {
             String main = new MainCheckdigit(location).toString();
             String left = new LeftCheckdigit(location).toString();
-//            String middle = new MiddleCheckdigit(location).toString();
-//            String right = new RightCheckdigit(location).toString();
-            String middle = "44";
-            String right = "99";
+            String middle = new MidCheckdigit(location).toString();
+            String right = new RightCheckdigit(location).toString();
             CheckDigits checkDigits = new CheckDigits(location, main, left, middle, right);
             return checkDigits;
         } catch (IllegalFormatException e) {
