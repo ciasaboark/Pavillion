@@ -33,7 +33,7 @@ public class EmailSenderService extends IntentService {
     public static final int FLAG_SEND_DAILY = 1;
     public static final int FLAG_SEND_WEEKLY = 2;
     public static final int FLAG_SEND_MONTHLY = 3;
-
+    public final SearchesDatabase db = SearchesDatabase.getInstance(this);
 
     public EmailSenderService() {
         super(TAG);
@@ -82,7 +82,6 @@ public class EmailSenderService extends IntentService {
 
     private void sendDailyReportIfEnabled(Intent intent) {
         //only send the email if the setting has been enabled
-        final SearchesDatabase db = SearchesDatabase.getInstance(this);
         Preferences prefs = Preferences.getInstance(this);
         boolean dailyReportsEnabled = prefs.shouldDailyReportsBeSent();
         boolean forceSend = intent.getBooleanExtra(FORCE_SEND, false);
@@ -106,28 +105,16 @@ public class EmailSenderService extends IntentService {
                 attachment = new Attachment(file, file.getName());
                 attachments.add(attachment);
 
-                EmailSender emailSender = new EmailSender(this)
-                        .setFailedListener(new EmailSender.EmailStatusListener() {
-                            @Override
-                            public void onEmailSendResult(String message, Object tag) {
-                                //the email sender server will have sent a broadcast notification
-                                Log.e(TAG, "Daily email could not be send, but no exception was thrown");
-                            }
-                        }, null)
-                        .setSuccessListener(new EmailSender.EmailStatusListener() {
-                            @Override
-                            public void onEmailSendResult(String message, Object tag) {
-                                Log.d(TAG, "Daily email was successfully sent");
-                                if (tag instanceof List) {
-                                    db.markRecordsAsSent((List<SearchRecord>) tag);
-                                }
+                String subject = "Check Digit Lookups for " + dateString;
+                String body = "Location check digit lookups for " + dateString + "\n\n";
 
-                            }
-                        }, unsetRecords)
-                        .setSubject("Check Digit Lookups for " + dateString)
-                        .setBody("Location check digit lookups for " + dateString + "\n\n")
-                        .withAttachments(attachments)
-                        .send();
+                if (unsetRecords.isEmpty()) {
+                    body += "No location checkdigits have been looked up since the last daily report was sent";
+                    sendEmail(subject, body, null, unsetRecords);
+                } else {
+                    sendEmail(subject, body, attachments, unsetRecords);
+                }
+
             } catch (IOException e) {
                 String message = "Caught Exception while sending daily report email: " + e.getMessage();
                 Log.e(TAG, message);
@@ -137,5 +124,30 @@ public class EmailSenderService extends IntentService {
 
         EmailScheduler emailScheduler = new EmailScheduler(this);
         emailScheduler.reschedule();
+    }
+
+    private void sendEmail(String subject, String body, List<Attachment> attachments, Object tag) {
+        EmailSender emailSender = new EmailSender(this)
+                .setFailedListener(new EmailSender.EmailStatusListener() {
+                    @Override
+                    public void onEmailSendResult(String message, Object tag) {
+                        //the email sender server will have sent a broadcast notification
+                        Log.e(TAG, "Daily email could not be send, but no exception was thrown");
+                    }
+                }, null)
+                .setSuccessListener(new EmailSender.EmailStatusListener() {
+                    @Override
+                    public void onEmailSendResult(String message, Object tag) {
+                        Log.d(TAG, "Daily email was successfully sent");
+                        if (tag instanceof List) {
+                            db.markRecordsAsSent((List<SearchRecord>) tag);
+                        }
+
+                    }
+                }, tag)
+                .setSubject(subject)
+                .setBody(body)
+                .withAttachments(attachments)
+                .send();
     }
 }
