@@ -14,14 +14,19 @@ import java.util.Date;
 public class CalendarHelper {
     public static final String TAG = CalendarHelper.class.getSimpleName();
 
+
+    public static long getFirstDayOfWeek(long timestamp) {
+        return getFirstDayOfWeek(timestamp, 0);
+    }
     /**
      * Returns a timestamp representing the beginning of a week relative to the given timestamp
      * @param timestamp
      * @return
      */
-    public static long getFirstDayOfWeek(long timestamp) {
+    public static long getFirstDayOfWeek(long timestamp, int offset) {
         Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.setTimeInMillis(timestamp);
+        calendar.add(Calendar.MONTH, offset);
         DateFormat df = new SimpleDateFormat();
 
         //shift the calendar to the first day of the week
@@ -38,15 +43,20 @@ public class CalendarHelper {
         return start;
     }
 
+    public static long getLastDayOfWeek(long timestamp) {
+        return getLastDayOfWeek(timestamp, 0);
+    }
+
     /**
      * Returns a timestamp representing the ending of a week relative to the given timestamp
      * @param timestamp
      * @return
      */
-    public static long getLastDayOfWeek(long timestamp) {
+    public static long getLastDayOfWeek(long timestamp, int offset) {
         long weekStart = getFirstDayOfWeek(timestamp);
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(weekStart);
+        calendar.add(Calendar.MONTH, offset);
 
         //shift the calendar to the last day of the week
         calendar.add(Calendar.DATE, 7);
@@ -59,14 +69,20 @@ public class CalendarHelper {
         return end;
     }
 
+    public static long getFirstDayOfMonth(long timestamp) {
+        return getFirstDayOfMonth(timestamp, 0);
+    }
+
     /**
      * Returns a timestamp representing the beginning of a month relative to the given timestamp
      * @param timestamp
      * @return
      */
-    public static long getFirstDayOfMonth(long timestamp) {
+    public static long getFirstDayOfMonth(long timestamp, int offset) {
         Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.setTimeInMillis(timestamp);
+        calendar.add(Calendar.MONTH, offset);
+
         DateFormat df = new SimpleDateFormat();
 
         //shift the calendar to the first day of the month
@@ -81,13 +97,17 @@ public class CalendarHelper {
         return start;
     }
 
+    public static long getLastDayOfMonth(long timestamp) {
+        return getLastDayOfMonth(timestamp, 0);
+    }
+
     /**
      * Returns a timestamp representing the end of a month relative to the given timestamp
      * @param timestamp
      * @return
      */
-    public static long getLastDayOfMonth(long timestamp) {
-        long monthStart = getFirstDayOfMonth(timestamp);
+    public static long getLastDayOfMonth(long timestamp, int offset) {
+        long monthStart = getFirstDayOfMonth(timestamp, offset);
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(monthStart);
 

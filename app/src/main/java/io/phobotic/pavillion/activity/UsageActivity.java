@@ -1,12 +1,17 @@
 package io.phobotic.pavillion.activity;
 
+import android.app.DatePickerDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.provider.CalendarContract;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.DatePicker;
 import android.widget.TextView;
 
 import com.androidplot.Plot;
@@ -19,6 +24,9 @@ import com.androidplot.xy.StepMode;
 import com.androidplot.xy.XYGraphWidget;
 import com.androidplot.xy.XYPlot;
 import com.androidplot.xy.XYSeries;
+import com.codetroopers.betterpickers.OnDialogDismissListener;
+import com.codetroopers.betterpickers.expirationpicker.ExpirationPickerBuilder;
+import com.codetroopers.betterpickers.expirationpicker.ExpirationPickerDialogFragment;
 
 import java.text.DateFormat;
 import java.text.FieldPosition;
@@ -26,6 +34,7 @@ import java.text.Format;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +46,9 @@ import io.phobotic.pavillion.database.SearchesDatabase;
 import io.phobotic.pavillion.report.SummaryByRange;
 import io.phobotic.pavillion.schedule.CalendarHelper;
 
+import static android.os.Build.VERSION.SDK;
+import static android.os.Build.VERSION.SDK_INT;
+
 /**
  * Created by Jonathan Nelson on 10/29/16.
  */
@@ -44,20 +56,76 @@ import io.phobotic.pavillion.schedule.CalendarHelper;
 public class UsageActivity extends AppCompatActivity {
     private SearchesDatabase searchesDatabase;
     private SummaryByRange monthSummary;
-
+    private long timestamp = System.currentTimeMillis();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_usage);
         setupActionBar();
-        
+
+        View dateBox = findViewById(R.id.date_box);
+        final Context context = this;
+        dateBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (SDK_INT >= 24) {
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.setTimeInMillis(timestamp);
+
+                    DatePickerDialog dialog = new DatePickerDialog(UsageActivity.this, null,
+                            calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH),
+                            calendar.get(Calendar.DAY_OF_MONTH))
+
+                    {
+                        @Override
+                        protected void onCreate(Bundle savedInstanceState)
+                        {
+                            super.onCreate(savedInstanceState);
+                            int year = getContext().getResources()
+                                    .getIdentifier("android:id/year", null, null);
+                            if(year != 0){
+                                View yearPicker = findViewById(year);
+                                if(yearPicker != null){
+                                    yearPicker.setVisibility(View.GONE);
+                                }
+                            }
+                        }
+                    };
+
+                    dialog.setOnDateSetListener(new DatePickerDialog.OnDateSetListener() {
+                        @Override
+                        public void onDateSet(DatePicker datePicker, int year, int month, int dayOfMonth) {
+                            Calendar cal = Calendar.getInstance();
+                            cal.set(Calendar.YEAR, year);
+                            cal.set(Calendar.MONTH, month);
+                            cal.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+
+                            timestamp = cal.getTimeInMillis();
+
+                            buildViews();
+                        }
+                    });
+
+                    dialog.show();
+                }
+            }
+        });
+
+
+
+
+        buildViews();
+
+    }
+
+    private void buildViews() {
         searchesDatabase = SearchesDatabase.getInstance(this);
         buildSummaries();
-        if (monthSummary.getSearchRecords().size() > 0) {
-            //show the graphs early to prevent the error from flashing on screen
-            showGraphs();
-            initGraphs();
-        } else {
+        //show the graphs early to prevent the error from flashing on screen
+        showGraphs();
+        initGraphs();
+
+        if (monthSummary.getSearchRecords().size() == 0) {
             hideGraphs();
         }
     }
@@ -90,20 +158,21 @@ public class UsageActivity extends AppCompatActivity {
     }
 
     private void buildSummaries() {
-        long now = System.currentTimeMillis();
-        long begin = CalendarHelper.getFirstDayOfMonth(now);
-        long end = CalendarHelper.getLastDayOfMonth(now);
+        long begin = CalendarHelper.getFirstDayOfMonth(timestamp);
+        long end = CalendarHelper.getLastDayOfMonth(timestamp);
         monthSummary = new SummaryByRange(this, begin, end);
         monthSummary.setIncludeEmpties(true);
         monthSummary.summarize();
-
     }
 
     private void initGraphs() {
         initTotalUsage();
-        initDailyUsageGraph();
-        initScatterPlotGraph();
-        initTestGraph();
+
+        if (monthSummary.getSearchRecords().size() > 0) {
+            initDailyUsageGraph();
+            initScatterPlotGraph();
+            initTestGraph();
+        }
     }
 
     private void initTestGraph() {
@@ -165,12 +234,14 @@ public class UsageActivity extends AppCompatActivity {
         // add a new series' to the xyplot:
         plot.addSeries(series1, series1Format);
 
+        //add pretty suffixes to the dates.  Conversion code from
+        //+ http://stackoverflow.com/questions/6810336/is-there-a-way-in-java-to-convert-an-integer-to-its-ordinal
         plot.getGraph().getLineLabelStyle(XYGraphWidget.Edge.BOTTOM).setFormat(new Format() {
             @Override
             public StringBuffer format(Object obj, StringBuffer toAppendTo, FieldPosition pos) {
                 int i = Math.round(((Number) obj).floatValue());
                 int day = (int)domainLabels[i];
-                //conversion code from http://stackoverflow.com/questions/6810336/is-there-a-way-in-java-to-convert-an-integer-to-its-ordinal
+
                 String[] sufixes = new String[] { "th", "st", "nd", "rd", "th", "th", "th", "th", "th", "th" };
                 String dayString;
                 int mod = day % 100;
@@ -217,14 +288,14 @@ public class UsageActivity extends AppCompatActivity {
     private void initTotalUsage() {
         TextView monthTitle = (TextView) findViewById(R.id.usage_month);
         TextView yearTitle = (TextView) findViewById(R.id.usage_year);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(timestamp);
 
-        SearchRecord firstRecord = monthSummary.getSearchRecords().get(0);
-        SearchRecord lastRecord = monthSummary.getSearchRecords().get(monthSummary.getSearchRecords().size() -1);
         DateFormat monthFormatter = new SimpleDateFormat("MMMM");
         DateFormat yearFormatter = new SimpleDateFormat("yyyy");
 
-        String month = monthFormatter.format(new Date(firstRecord.getTimestamp()));
-        String year = yearFormatter.format(new Date(firstRecord.getTimestamp()));
+        String month = monthFormatter.format(new Date(calendar.getTimeInMillis()));
+        String year = yearFormatter.format(new Date(calendar.getTimeInMillis()));
         monthTitle.setText(month);
         yearTitle.setText(year);
 
@@ -359,7 +430,8 @@ public class UsageActivity extends AppCompatActivity {
         plot.getBorderPaint().setColor(Color.TRANSPARENT);
         plot.setBackgroundColor(Color.TRANSPARENT);
         plot.setPlotMargins(0, 0, 0, 0);
-        plot.setRangeStep(StepMode.INCREMENT_BY_VAL, 1);
+
+
 
 
         int daysInMonth = monthSummary.getDailyUsage().keySet().size();
@@ -368,12 +440,19 @@ public class UsageActivity extends AppCompatActivity {
             calendarDays.add(i);
         }
 
+        float maxVal = 0;
         List<Number> values = new ArrayList<>();
-        Random random = new Random();
         for (int i = 1; i <= daysInMonth; i++) {
             int dayValue = monthSummary.getDailyUsage().get(i);
             values.add(dayValue);
+
+            if (dayValue > maxVal) {
+                maxVal = (float) dayValue;
+            }
         }
+
+        int subdivide = (int) Math.ceil(maxVal / 5);
+        plot.setRangeStep(StepMode.INCREMENT_BY_VAL, subdivide);
 
         final Number[] domainLabels = calendarDays.toArray(new Number[]{});
         Number[] series1Numbers = values.toArray(new Number[]{});

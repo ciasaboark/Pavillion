@@ -19,27 +19,149 @@
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
             app:popupTheme="@style/AppTheme.PopupOverlay"/>
+
     </android.support.design.widget.AppBarLayout>
 
-    <LinearLayout
+    <android.support.v7.widget.CardView
+        android:id="@+id/total_usage_graph_holder"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <RelativeLayout
+                android:id="@+id/date_box"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_marginRight="16dp"
+                android:background="?attr/colorAccent"
+                android:clickable="true"
+                android:foreground="?attr/selectableItemBackground">
+
+                <TextView
+                    android:id="@+id/usage_year"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginBottom="8dp"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal"
+                    android:text="Year"
+                    android:textColor="?android:attr/textColorPrimaryInverse"
+                    android:textSize="24sp"
+                    android:textStyle="normal|bold"/>
+
+                <TextView
+                    android:id="@+id/usage_month"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_above="@+id/usage_year"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:gravity="center_horizontal"
+                    android:text="Month"
+                    android:textColor="?android:attr/textColorPrimaryInverse"
+                    android:textSize="18dp"
+                    android:textStyle="normal|bold"
+                    />
+
+                <ImageView
+                    android:id="@+id/imageView"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_above="@+id/usage_month"
+                    android:layout_centerHorizontal="true"
+                    app:srcCompat="@drawable/ic_calendar_white_48dp"/>
+            </RelativeLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:orientation="vertical"
+                >
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Total lookups:"
+                        android:textColor="?android:attr/textColorPrimary"
+                        android:textSize="18sp"/>
+
+                    <TextView
+                        android:id="@+id/total_lookups"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="8dp"
+                        android:text="0"
+                        android:textColor="?android:attr/textColorSecondary"
+                        android:textSize="18sp"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Unique Locations:"
+                        android:textColor="?android:attr/textColorPrimary"
+                        android:textSize="18sp">
+                    </TextView>
+
+                    <TextView
+                        android:id="@+id/unique_locations"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="8dp"
+                        android:text="0"
+                        android:textColor="?android:attr/textColorSecondary"
+                        android:textSize="18sp"/>
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </android.support.v7.widget.CardView>
+
+    <RelativeLayout
         android:id="@+id/usage_error"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/card_error_background"
         android:orientation="vertical"
         android:visibility="gone">
 
         <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/card_error_background">
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:background="@color/card_error_background"
+            android:clickable="false"
+            android:longClickable="false"
+            android:paddingBottom="64dp">
 
             <TextView
                 android:id="@+id/textView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
-                android:text="Nothing to see yet"
+                android:layout_centerHorizontal="false"
+                android:layout_centerVertical="false"
+                android:text="Nothing to see for this month"
                 android:textColor="?android:attr/textColorPrimaryInverse"
                 android:textSize="24sp"
                 android:textStyle="normal|bold"
@@ -58,12 +180,13 @@
                 android:textSize="18sp"/>
         </RelativeLayout>
 
-    </LinearLayout>
+    </RelativeLayout>
 
     <ScrollView
         android:id="@+id/graph_scroll_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:visibility="visible">
 
 
         <LinearLayout
@@ -72,193 +195,91 @@
             android:orientation="vertical">
 
 
-            <android.support.v7.widget.CardView
-                android:id="@+id/total_usage_graph_holder"
+            <LinearLayout
+                android:id="@+id/usage_graphs"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:padding="16dp">
+                android:orientation="vertical">
 
-                <LinearLayout
+                <android.support.v7.widget.CardView
+                    android:id="@+id/daily_usage_graph_holder"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:layout_margin="16dp"
+                    android:visibility="visible">
 
                     <RelativeLayout
-                        android:layout_width="120dp"
-                        android:layout_height="120dp"
-                        android:layout_marginRight="16dp"
-                        android:background="?attr/colorAccent">
-
-                        <TextView
-                            android:id="@+id/usage_year"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentBottom="true"
-                            android:layout_alignParentLeft="true"
-                            android:layout_alignParentStart="true"
-                            android:layout_marginBottom="8dp"
-                            android:layout_weight="1"
-                            android:gravity="center_horizontal"
-                            android:text="Year"
-                            android:textColor="?android:attr/textColorPrimaryInverse"
-                            android:textSize="24sp"
-                            android:textStyle="normal|bold"/>
-
-                        <TextView
-                            android:id="@+id/usage_month"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_above="@+id/usage_year"
-                            android:layout_alignParentLeft="true"
-                            android:layout_alignParentStart="true"
-                            android:gravity="center_horizontal"
-                            android:text="Usage"
-                            android:textColor="?android:attr/textColorPrimaryInverse"
-                            android:textSize="18dp"
-                            android:textStyle="normal|bold"
-                            />
-
-                        <ImageView
-                            android:id="@+id/imageView"
-                            android:layout_width="36dp"
-                            android:layout_height="36dp"
-                            android:layout_above="@+id/usage_month"
-                            android:layout_centerHorizontal="true"
-                            app:srcCompat="@drawable/ic_calendar_white_48dp"/>
-                    </RelativeLayout>
-
-
-                    <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:orientation="vertical"
-                        >
+                        android:layout_height="match_parent"
+                        android:layout_margin="8dp">
 
-                        <LinearLayout
+                        <com.androidplot.xy.XYPlot
+                            android:id="@+id/daily_usage_graph"
+                            style="@style/APDefacto.Light"
+                            android:layout_width="fill_parent"
+                            android:layout_height="250dp"
+                            ap:domainTitle="domain"
+                            ap:lineLabelRotationBottom="-45"
+                            ap:lineLabels="left|bottom"
+                            ap:rangeTitle="range"
+                            ap:title="Usage"/>
+
+                        <TextView
+                            android:id="@+id/daily_usage_title"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal">
+                            android:layout_alignParentBottom="true"
+                            android:layout_below="@id/daily_usage_graph"
+                            android:layout_centerHorizontal="true"
+                            android:padding="8dp"
+                            android:text="Daily Usage"
+                            android:textAppearance="@android:style/TextAppearance.Material.Medium"
+                            android:textColor="?android:attr/textColorPrimary"
+                            android:textStyle="normal|bold"/>
+                    </RelativeLayout>
+                </android.support.v7.widget.CardView>
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Total lookups:"
-                                android:textColor="?android:attr/textColorPrimary"
-                                android:textSize="18sp"/>
 
-                            <TextView
-                                android:id="@+id/total_lookups"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginLeft="8dp"
-                                android:text="0"
-                                android:textColor="?android:attr/textColorSecondary"
-                                android:textSize="18sp"/>
-                        </LinearLayout>
+                <android.support.v7.widget.CardView
+                    android:id="@+id/hourly_usage_graph_holder"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16dp"
+                    android:visibility="visible">
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_margin="8dp">
+
+                        <com.androidplot.xy.XYPlot
+                            android:id="@+id/hourly_usage_graph"
+                            style="@style/APDefacto.Light"
+                            androidPlot.graphWidget.marginLeft="20dp"
+                            android:layout_width="fill_parent"
+                            android:layout_height="250dp"
+                            ap:domainTitle="domain"
+                            ap:lineLabelRotationBottom="-45"
+                            ap:lineLabels="left|bottom"
+                            ap:rangeTitle="range"
+                            ap:title="A Simple XY Plot"/>
+
+                        <TextView
+                            android:id="@+id/hourly_usage_title"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:orientation="horizontal">
+                            android:layout_alignParentBottom="true"
+                            android:layout_below="@id/hourly_usage_graph"
+                            android:layout_centerHorizontal="true"
+                            android:padding="8dp"
+                            android:text="Hourly Usage"
+                            android:textAppearance="@android:style/TextAppearance.Material.Medium"
+                            android:textColor="?android:attr/textColorPrimary"
+                            android:textStyle="normal|bold"/>
+                    </RelativeLayout>
+                </android.support.v7.widget.CardView>
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Unique Locations:"
-                                android:textColor="?android:attr/textColorPrimary"
-                                android:textSize="18sp">
-                            </TextView>
-
-                            <TextView
-                                android:id="@+id/unique_locations"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginLeft="8dp"
-                                android:text="0"
-                                android:textColor="?android:attr/textColorSecondary"
-                                android:textSize="18sp"/>
-                        </LinearLayout>
-                    </LinearLayout>
-                </LinearLayout>
-            </android.support.v7.widget.CardView>
-
-            <android.support.v7.widget.CardView
-                android:id="@+id/daily_usage_graph_holder"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="16dp">
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_margin="8dp">
-
-                    <com.androidplot.xy.XYPlot
-                        android:id="@+id/daily_usage_graph"
-                        style="@style/APDefacto.Light"
-                        android:layout_width="fill_parent"
-                        android:layout_height="250dp"
-                        ap:domainTitle="domain"
-                        ap:lineLabelRotationBottom="-45"
-                        ap:lineLabels="left|bottom"
-                        ap:rangeTitle="range"
-                        ap:title="Usage"/>
-
-                    <TextView
-                        android:id="@+id/daily_usage_title"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentBottom="true"
-                        android:layout_below="@id/daily_usage_graph"
-                        android:layout_centerHorizontal="true"
-                        android:padding="8dp"
-                        android:text="Daily Usage"
-                        android:textAppearance="@android:style/TextAppearance.Material.Medium"
-                        android:textColor="?android:attr/textColorPrimary"
-                        android:textStyle="normal|bold"/>
-                </RelativeLayout>
-            </android.support.v7.widget.CardView>
-
-
-            <android.support.v7.widget.CardView
-                android:id="@+id/hourly_usage_graph_holder"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="16dp">
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_margin="8dp">
-
-                    <com.androidplot.xy.XYPlot
-                        android:id="@+id/hourly_usage_graph"
-                        style="@style/APDefacto.Light"
-                        androidPlot.graphWidget.marginLeft="20dp"
-                        android:layout_width="fill_parent"
-                        android:layout_height="250dp"
-                        ap:domainTitle="domain"
-                        ap:lineLabelRotationBottom="-45"
-                        ap:lineLabels="left|bottom"
-                        ap:rangeTitle="range"
-                        ap:title="A Simple XY Plot"/>
-
-                    <TextView
-                        android:id="@+id/hourly_usage_title"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentBottom="true"
-                        android:layout_below="@id/hourly_usage_graph"
-                        android:layout_centerHorizontal="true"
-                        android:padding="8dp"
-                        android:text="Hourly Usage"
-                        android:textAppearance="@android:style/TextAppearance.Material.Medium"
-                        android:textColor="?android:attr/textColorPrimary"
-                        android:textStyle="normal|bold"/>
-                </RelativeLayout>
-            </android.support.v7.widget.CardView>
+            </LinearLayout>
 
 
         </LinearLayout>
