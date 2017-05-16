@@ -2,11 +2,9 @@ package io.phobotic.pavillion.activity;
 
 import android.app.DatePickerDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.provider.CalendarContract;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -24,9 +22,6 @@ import com.androidplot.xy.StepMode;
 import com.androidplot.xy.XYGraphWidget;
 import com.androidplot.xy.XYPlot;
 import com.androidplot.xy.XYSeries;
-import com.codetroopers.betterpickers.OnDialogDismissListener;
-import com.codetroopers.betterpickers.expirationpicker.ExpirationPickerBuilder;
-import com.codetroopers.betterpickers.expirationpicker.ExpirationPickerDialogFragment;
 
 import java.text.DateFormat;
 import java.text.FieldPosition;
@@ -46,7 +41,6 @@ import io.phobotic.pavillion.database.SearchesDatabase;
 import io.phobotic.pavillion.report.SummaryByRange;
 import io.phobotic.pavillion.schedule.CalendarHelper;
 
-import static android.os.Build.VERSION.SDK;
 import static android.os.Build.VERSION.SDK_INT;
 
 /**

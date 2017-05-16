@@ -20,19 +20,35 @@
         android:gravity="center_vertical"
         >
 
-        <ImageView
-            android:id="@+id/photo"
+        <RelativeLayout
+            android:id="@+id/photo_box"
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:background="@android:color/darker_gray"
-            android:scaleType="centerCrop"/>
+            android:background="@android:color/darker_gray">
+
+            <ImageView
+                android:id="@+id/camera_image"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_camera_off_white_24dp"
+                />
+
+            <ImageView
+                android:id="@+id/photo"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:scaleType="centerCrop"/>
+        </RelativeLayout>
+
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_alignBottom="@+id/photo"
+            android:layout_alignBottom="@+id/photo_box"
             android:layout_gravity="center_horizontal"
-            android:layout_toRightOf="@+id/photo"
+            android:layout_toRightOf="@+id/photo_box"
             android:gravity="center_horizontal"
             android:orientation="vertical">
 
